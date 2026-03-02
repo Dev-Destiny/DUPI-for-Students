@@ -121,7 +121,7 @@ const Hero: FC = () => {
                   <Link to="/waitlist" className="block w-full">
                     <button className="relative w-full overflow-hidden bg-brand-orange/10 text-brand-orange hover:bg-brand-orange/20 transition-all duration-300 cursor-pointer flex items-center justify-center gap-2 px-10 h-14 text-lg font-bold rounded-full shadow-sm">
                       <span className="material-symbols-outlined text-xl group-hover:scale-110 transition-transform">diamond</span>
-                      <span>Get Started Free</span>
+                      <span>Join Waitlist</span>
                     </button>
                   </Link>
                 </div>
