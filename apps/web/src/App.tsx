@@ -1,80 +1,133 @@
 import { useEffect } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import { useAuthStore } from "./store/auth.store";
-import LoginPage from "./pages/auth/LoginPage";
-import SignupPage from "./pages/auth/SignupPage";
-import OnboardingPage from "./pages/onboarding/OnboardingPage";
+import LoginPage from "./modules/auth/pages/LoginPage";
+import SignupPage from "./modules/auth/pages/SignupPage";
+import OnboardingPage from "./modules/onboarding/pages/OnboardingPage";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 
-// Placeholder Dashboard
-const Dashboard = () => (
-  <div className="p-8">
-    <h1 className="text-2xl font-bold">Dashboard (Protected)</h1>
-    <p>Welcome to your AI-powered assessment dashboard!</p>
-    <button 
-      onClick={() => useAuthStore.getState().logout()}
-      className="mt-4 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
-    >
-      Logout
-    </button>
-  </div>
-);
+import HomeLayout from "./modules/home/layouts/HomeLayout";
+import DashboardPage from "./modules/home/dashboard/pages/DashboardPage";
+import DocumentsPage from "./modules/home/documents/pages/DocumentsPage";
+import TestsPage from "./modules/home/tests/pages/TestsPage";
+import FlashcardsPage from "./modules/home/flashcards/pages/FlashcardsPage";
+import AnalyticsPage from "./modules/home/analytics/pages/AnalyticsPage";
 
 function App() {
-  const { checkAuth, isAuthenticated, user } = useAuthStore();
+	const { checkAuth, isAuthenticated, user } = useAuthStore();
 
-  useEffect(() => {
-    checkAuth();
-  }, [checkAuth]);
+	useEffect(() => {
+		checkAuth();
+	}, [checkAuth]);
 
-  return (
-    <Routes>
-      {/* Public Routes */}
-      <Route 
-        path="/login" 
-        element={isAuthenticated ? <Navigate to="/" replace /> : <LoginPage />} 
-      />
-      <Route 
-        path="/signup" 
-        element={isAuthenticated ? <Navigate to="/" replace /> : <SignupPage />} 
-      />
+	return (
+		<Routes>
+			{/* Public Routes */}
+			<Route
+				path='/login'
+				element={
+					isAuthenticated ? (
+						<Navigate to='/' replace />
+					) : (
+						<LoginPage />
+					)
+				}
+			/>
+			<Route
+				path='/signup'
+				element={
+					isAuthenticated ? (
+						<Navigate to='/' replace />
+					) : (
+						<SignupPage />
+					)
+				}
+			/>
 
-      {/* Onboarding - Protected but accessible if !isOnboarded */}
-      <Route
-        path="/onboarding"
-        element={
-          <ProtectedRoute>
-            {user?.isOnboarded ? <Navigate to="/dashboard" replace /> : <OnboardingPage />}
-          </ProtectedRoute>
-        }
-      />
+			{/* Onboarding - Protected but accessible if !isOnboarded */}
+			<Route
+				path='/onboarding'
+				element={
+					<ProtectedRoute>
+						{user?.isOnboarded ? (
+							<Navigate to='/dashboard' replace />
+						) : (
+							<OnboardingPage />
+						)}
+					</ProtectedRoute>
+				}
+			/>
 
-      {/* Protected Routes */}
-      <Route
-        path="/dashboard"
-        element={
-          <ProtectedRoute>
-            <Dashboard />
-          </ProtectedRoute>
-        }
-      />
+			{/* Protected Routes */}
+			<Route
+				path='/dashboard'
+				element={
+					<ProtectedRoute>
+						<HomeLayout>
+							<DashboardPage />
+						</HomeLayout>
+					</ProtectedRoute>
+				}
+			/>
+			<Route
+				path='/documents'
+				element={
+					<ProtectedRoute>
+						<HomeLayout>
+							<DocumentsPage />
+						</HomeLayout>
+					</ProtectedRoute>
+				}
+			/>
+			<Route
+				path='/tests'
+				element={
+					<ProtectedRoute>
+						<HomeLayout>
+							<TestsPage />
+						</HomeLayout>
+					</ProtectedRoute>
+				}
+			/>
+			<Route
+				path='/flashcards'
+				element={
+					<ProtectedRoute>
+						<HomeLayout>
+							<FlashcardsPage />
+						</HomeLayout>
+					</ProtectedRoute>
+				}
+			/>
+			<Route
+				path='/analytics'
+				element={
+					<ProtectedRoute>
+						<HomeLayout>
+							<AnalyticsPage />
+						</HomeLayout>
+					</ProtectedRoute>
+				}
+			/>
 
-      {/* Root redirect logic */}
-      <Route 
-        path="/" 
-        element={
-          !isAuthenticated 
-            ? <Navigate to="/login" replace /> 
-            : !user?.isOnboarded 
-              ? <Navigate to="/onboarding" replace /> 
-              : <Navigate to="/dashboard" replace />
-        } 
-      />
-      
-      {/* 404 Redirect */}
-      <Route path="*" element={<Navigate to="/" replace />} />
-    </Routes>
-  );
+			{/* Root redirect logic */}
+			<Route
+				path='/'
+				element={
+					!isAuthenticated ? (
+						<Navigate to='/login' replace />
+					) : !user?.isOnboarded ? (
+						<Navigate to='/onboarding' replace />
+					) : (
+						<Navigate to='/dashboard' replace />
+					)
+				}
+			/>
+
+			{/* 404 Redirect */}
+			<Route path='*' element={<Navigate to='/' replace />} />
+		</Routes>
+	);
 }
 
 export default App;

@@ -1,137 +1,166 @@
-@import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Space+Grotesk:wght@400;500;600;700&display=swap");
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
-  :root {
-    /* DUPI Brand Color Palette */
-    --background: 150 11% 97%;        /* #f6f8f7 */
-    --foreground: 150 30% 10%;        /* Dark green-tinted black */
-    
-    --card: 0 0% 100%;
-    --card-foreground: 150 30% 10%;
- 
-    --popover: 0 0% 100%;
-    --popover-foreground: 150 30% 10%;
- 
-    --primary: 22 100% 56%;            /* #FF6F20 - Vibrant Orange */
-    --primary-foreground: 0 0% 100%;
- 
-    --secondary: 210 14% 96%;
-    --secondary-foreground: 210 11% 40%;
-    
-    --accent: 210 14% 96%;
-    --accent-foreground: 210 11% 40%;
- 
-    --muted: 210 14% 96%;
-    --muted-foreground: 215 16% 47%;
- 
-    --destructive: 0 84% 60%;
-    --destructive-foreground: 0 0% 100%;
+	:root {
+		/* DUPI Midnight Light (Soft White) */
+		--background: 30 20% 98%; /* #FAF9F6 - Soft Paper */
+		--foreground: 240 10% 3.9%; /* Near Black */
 
-    --border: 214 20% 92%;
-    --input: 214 20% 92%;
-    --ring: 22 100% 56%;
- 
-    --radius: 0.75rem;
-  }
- 
-  .dark {
-    --background: 150 30% 8%;         /* #122017 */
-    --foreground: 0 0% 98%;
- 
-    --card: 210 10% 10%;
-    --card-foreground: 0 0% 98%;
- 
-    --popover: 210 10% 10%;
-    --popover-foreground: 0 0% 98%;
- 
-    --primary: 22 100% 56%;
-    --primary-foreground: 0 0% 100%;
- 
-    --secondary: 210 10% 15%;
-    --secondary-foreground: 0 0% 98%;
-    
-    --accent: 210 10% 15%;
-    --accent-foreground: 0 0% 98%;
- 
-    --muted: 210 10% 15%;
-    --muted-foreground: 0 0% 64%;
- 
-    --destructive: 0 62% 30%;
-    --destructive-foreground: 0 0% 98%;
- 
-    --border: 210 10% 15%;
-    --input: 210 10% 15%;
-    --ring: 22 100% 56%;
-  }
+		--card: 0 0% 100%;
+		--card-foreground: 240 10% 3.9%;
+
+		--popover: 0 0% 100%;
+		--popover-foreground: 240 10% 3.9%;
+
+		--primary: 22 100% 56%; /* Brand Orange */
+		--primary-foreground: 0 0% 100%;
+
+		--secondary: 240 4.8% 95.9%;
+		--secondary-foreground: 240 5.9% 10%;
+
+		--accent: 240 4.8% 95.9%;
+		--accent-foreground: 240 5.9% 10%;
+
+		--muted: 240 4.8% 95.9%;
+		--muted-foreground: 240 3.8% 46.1%;
+
+		--destructive: 0 84.2% 60.2%;
+		--destructive-foreground: 0 0% 98%;
+
+		--border: 240 5.9% 90%;
+		--input: 240 5.9% 90%;
+		--ring: 22 100% 56%;
+
+		--radius: 0.75rem;
+	}
+
+	.dark {
+		/* DUPI Midnight Dark (Elite Charcoal) */
+		--background: 240 10% 3.9%; /* #09090B */
+		--foreground: 0 0% 98%;
+
+		--card: 240 10% 6%; /* #101012 */
+		--card-foreground: 0 0% 98%;
+
+		--popover: 240 10% 3.9%;
+		--popover-foreground: 0 0% 98%;
+
+		--primary: 22 100% 56%;
+		--primary-foreground: 0 0% 100%;
+
+		--secondary: 240 3.7% 15.9%;
+		--secondary-foreground: 0 0% 98%;
+
+		--accent: 240 3.7% 15.9%;
+		--accent-foreground: 0 0% 98%;
+
+		--muted: 240 3.7% 15.9%;
+		--muted-foreground: 240 5% 64.9%;
+
+		--destructive: 0 62.8% 30.6%;
+		--destructive-foreground: 0 0% 98%;
+
+		--border: 240 3.7% 15.9%;
+		--input: 240 3.7% 15.9%;
+		--ring: 22 100% 56%;
+	}
 }
 
 @layer base {
-  * {
-    border-color: hsl(var(--border));
-  }
-  
-  html {
-    scroll-behavior: smooth;
-  }
-  
-  body {
-    @apply bg-background-light text-foreground antialiased font-grotesk;
-  }
-  
-  /* Serif headings - Lora */
-  .serif-heading {
-    font-family: 'Lora', serif;
-  }
-  
-  /* Material Symbols config */
-  .material-symbols-outlined {
-    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
-  }
+	* {
+		border-color: hsl(var(--border));
+	}
+
+	html {
+		scroll-behavior: smooth;
+	}
+
+	body {
+		@apply bg-background text-foreground antialiased font-grotesk min-h-screen transition-colors duration-300;
+	}
+
+	/* Serif headings - Lora */
+	.serif-heading {
+		font-family: "Lora", serif;
+	}
+
+	/* Material Symbols config */
+	.material-symbols-outlined {
+		font-variation-settings:
+			"FILL" 0,
+			"wght" 400,
+			"GRAD" 0,
+			"opsz" 24;
+	}
 }
 
 @layer utilities {
-  /* Glass card effect */
-  .glass-card {
-    background: rgba(255, 255, 255, 0.7);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-  }
-  
-  .dark .glass-card {
-    background: rgba(15, 15, 15, 0.7);
-    border: 1px solid rgba(255, 255, 255, 0.05);
-  }
-  
-  /* Auth layout background pattern */
-  .auth-bg-pattern {
-    background-image: 
-      radial-gradient(circle at 20% 50%, rgba(98, 16, 159, 0.08) 0%, transparent 50%),
-      radial-gradient(circle at 80% 20%, rgba(255, 111, 32, 0.06) 0%, transparent 50%),
-      radial-gradient(circle at 50% 80%, rgba(255, 213, 79, 0.05) 0%, transparent 50%);
-  }
+	/* Glass card effect */
+	.glass-card {
+		background: rgba(255, 255, 255, 0.7);
+		backdrop-filter: blur(10px);
+		-webkit-backdrop-filter: blur(10px);
+		border: 1px solid rgba(255, 255, 255, 0.2);
+	}
 
-  /* Floating animation for decorative elements */
-  @keyframes float {
-    0%, 100% { transform: translateY(0px) rotate(0deg); }
-    33% { transform: translateY(-10px) rotate(1deg); }
-    66% { transform: translateY(5px) rotate(-1deg); }
-  }
+	.dark .glass-card {
+		background: rgba(15, 15, 15, 0.7);
+		border: 1px solid rgba(255, 255, 255, 0.05);
+	}
 
-  .animate-float {
-    animation: float 6s ease-in-out infinite;
-  }
+	/* Auth layout background pattern */
+	.auth-bg-pattern {
+		background-image:
+			radial-gradient(
+				circle at 20% 50%,
+				rgba(98, 16, 159, 0.08) 0%,
+				transparent 50%
+			),
+			radial-gradient(
+				circle at 80% 20%,
+				rgba(255, 111, 32, 0.06) 0%,
+				transparent 50%
+			),
+			radial-gradient(
+				circle at 50% 80%,
+				rgba(255, 213, 79, 0.05) 0%,
+				transparent 50%
+			);
+	}
 
-  .animate-float-delayed {
-    animation: float 6s ease-in-out 2s infinite;
-  }
+	/* Floating animation for decorative elements */
+	@keyframes float {
+		0%,
+		100% {
+			transform: translateY(0px) rotate(0deg);
+		}
+		33% {
+			transform: translateY(-10px) rotate(1deg);
+		}
+		66% {
+			transform: translateY(5px) rotate(-1deg);
+		}
+	}
 
-  /* Subtle pulse glow */
-  @keyframes pulse-glow {
-    0%, 100% { box-shadow: 0 0 20px rgba(98, 16, 159, 0.1); }
-    50% { box-shadow: 0 0 40px rgba(98, 16, 159, 0.2); }
-  }
+	.animate-float {
+		animation: float 6s ease-in-out infinite;
+	}
+
+	.animate-float-delayed {
+		animation: float 6s ease-in-out 2s infinite;
+	}
+
+	/* Subtle pulse glow */
+	@keyframes pulse-glow {
+		0%,
+		100% {
+			box-shadow: 0 0 20px rgba(98, 16, 159, 0.1);
+		}
+		50% {
+			box-shadow: 0 0 40px rgba(98, 16, 159, 0.2);
+		}
+	}
 }

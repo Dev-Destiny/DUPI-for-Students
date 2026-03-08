@@ -37,3 +37,6 @@ coverage/
 # Temporary files
 .temp/
 *.tmp
+GEMINI.md
+PRD_DUPI.md
+LANDING_PAGE_ENHANCEMENTS.md
