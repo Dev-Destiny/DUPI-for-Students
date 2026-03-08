@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>DUPI: AI-Driven Interactive Test Generator</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,typography,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&amp;family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script>tailwind.config = {darkMode: "class", theme: {extend: {colors: {primary: "#39E079", "background-light": "#f6f8f7", "background-dark": "#122017"}, fontFamily: {display: "Font Unspecified", sans: ["Inter", "sans-serif"]}, borderRadius: {DEFAULT: "0px", lg: "0px", xl: "0px", full: "0px"}}}};</script>
+<style type="text/tailwindcss">
+        .serif-heading { font-family: 'Instrument Serif', serif; }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .dark .glass-card {
+            background: rgba(15, 15, 15, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-sans antialiased">
+<nav class="sticky top-0 z-50 bg-white/80 dark:bg-black/80 backdrop-blur-md border-b border-slate-100 dark:border-slate-900">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+<div class="flex justify-between items-center h-16">
+<div class="flex items-center gap-2">
+<div class="w-9 h-9 bg-primary rounded-xl flex items-center justify-center text-white">
+<span class="material-symbols-outlined text-2xl">auto_fix_high</span>
+</div>
+<span class="text-2xl font-bold tracking-tighter">DUPI</span>
+</div>
+<div class="hidden md:flex items-center space-x-8 text-sm font-medium">
+<a class="hover:text-primary transition-colors" href="#how-it-works">How it Works</a>
+<a class="hover:text-primary transition-colors" href="#features">Features</a>
+<a class="hover:text-primary transition-colors" href="#pricing">Pricing</a>
+<button class="px-4 py-2 text-slate-600 dark:text-slate-300 hover:text-primary">Log In</button>
+<button class="px-5 py-2.5 bg-primary text-white rounded-full font-semibold hover:shadow-lg hover:shadow-primary/20 transition-all">Start Generating</button>
+</div>
+<div class="md:hidden">
+<span class="material-symbols-outlined">menu</span>
+</div>
+</div>
+</div>
+</nav>
+<header class="relative pt-20 pb-16 lg:pt-32 lg:pb-32 overflow-hidden">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+<div class="grid lg:grid-cols-2 gap-16 items-center">
+<div class="text-left">
+<h1 class="serif-heading text-5xl md:text-7xl lg:text-8xl leading-[1.1] mb-8">
+                    Turn your study materials into <span class="italic text-primary">interactive mastery tests</span>.
+                </h1>
+<p class="max-w-lg text-lg md:text-xl text-slate-600 dark:text-slate-400 mb-10 leading-relaxed">
+                    DUPI uses advanced AI to analyze your PDFs, lecture notes, and slides to create personalized practice exams that actually help you learn.
+                </p>
+<div class="flex flex-col sm:flex-row items-center gap-4">
+<button class="w-full sm:w-auto px-10 py-4 bg-primary text-white rounded-full text-lg font-semibold hover:shadow-xl hover:shadow-primary/30 transition-all">
+                        Get Started Free
+                    </button>
+<button class="w-full sm:w-auto px-10 py-4 bg-transparent border border-slate-200 dark:border-slate-800 rounded-full text-lg font-semibold hover:bg-slate-50 dark:hover:bg-slate-900 transition-all">
+                        View Demo
+                    </button>
+</div>
+</div>
+<div class="relative group">
+<div class="aspect-[4/3] rounded-[2rem] border-2 border-dashed border-slate-300 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-900/50 flex flex-col items-center justify-center p-8 transition-colors group-hover:border-primary/50 group-hover:bg-primary/5">
+<div class="w-20 h-20 bg-white dark:bg-slate-800 rounded-2xl shadow-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-500">
+<span class="material-symbols-outlined text-4xl text-primary">upload_file</span>
+</div>
+<p class="text-xl font-semibold mb-2">Drop your files here</p>
+<p class="text-slate-500 dark:text-slate-400 text-sm">PDF, DOCX, or text notes (up to 50MB)</p>
+<div class="mt-8 flex gap-2">
+<div class="w-32 h-2 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
+<div class="w-1/2 h-full bg-primary"></div>
+</div>
+</div>
+</div>
+<div class="absolute -top-6 -right-6 w-32 h-32 bg-primary/10 blur-3xl rounded-full"></div>
+<div class="absolute -bottom-6 -left-6 w-32 h-32 bg-blue-500/10 blur-3xl rounded-full"></div>
+</div>
+</div>
+</div>
+<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1000px] h-[500px] bg-primary/5 blur-[120px] rounded-full -z-0"></div>
+</header>
+<section class="py-24 bg-white dark:bg-black" id="how-it-works">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+<div class="text-center mb-20">
+<h2 class="serif-heading text-4xl md:text-5xl mb-4">How DUPI Works</h2>
+<p class="text-slate-600 dark:text-slate-400">Master any subject in three simple steps.</p>
+</div>
+<div class="grid md:grid-cols-3 gap-12">
+<div class="text-center group">
+<div class="w-16 h-16 bg-slate-50 dark:bg-slate-900 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:bg-primary group-hover:text-white transition-all duration-300">
+<span class="material-symbols-outlined text-3xl">cloud_upload</span>
+</div>
+<h3 class="text-xl font-bold mb-3">1. Upload</h3>
+<p class="text-slate-600 dark:text-slate-400">Upload your PDFs, slides, or even messy handwritten notes.</p>
+</div>
+<div class="text-center group">
+<div class="w-16 h-16 bg-slate-50 dark:bg-slate-900 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:bg-primary group-hover:text-white transition-all duration-300">
+<span class="material-symbols-outlined text-3xl">psychology</span>
+</div>
+<h3 class="text-xl font-bold mb-3">2. Generate</h3>
+<p class="text-slate-600 dark:text-slate-400">Our AI identifies key concepts and generates smart questions.</p>
+</div>
+<div class="text-center group">
+<div class="w-16 h-16 bg-slate-50 dark:bg-slate-900 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:bg-primary group-hover:text-white transition-all duration-300">
+<span class="material-symbols-outlined text-3xl">military_tech</span>
+</div>
+<h3 class="text-xl font-bold mb-3">3. Practice</h3>
+<p class="text-slate-600 dark:text-slate-400">Take the interactive test and master the material instantly.</p>
+</div>
+</div>
+</div>
+</section>
+<section class="py-24 bg-slate-50 dark:bg-slate-900/30" id="features">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+<div class="mb-16 text-center">
+<h2 class="serif-heading text-4xl md:text-5xl mb-4">Studying, Reimagined</h2>
+<p class="text-slate-600 dark:text-slate-400">A suite of AI tools designed for academic success.</p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-4 md:grid-rows-2 gap-6 h-auto md:h-[600px]">
+<div class="md:col-span-2 md:row-span-2 bg-white dark:bg-slate-800 p-8 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-700 flex flex-col justify-between group overflow-hidden relative">
+<div class="relative z-10">
+<div class="w-12 h-12 bg-blue-100 dark:bg-blue-900/30 text-primary rounded-xl flex items-center justify-center mb-6">
+<span class="material-symbols-outlined">auto_awesome</span>
+</div>
+<h3 class="text-3xl font-bold mb-4">AI-Powered Question Generation</h3>
+<p class="text-slate-600 dark:text-slate-400 max-w-sm text-lg">Not just flashcards. DUPI creates multiple-choice, open-ended, and scenario-based questions that test deep understanding.</p>
+</div>
+<div class="mt-12 relative h-48 rounded-2xl overflow-hidden border border-slate-100 dark:border-slate-700 shadow-inner">
+<img alt="AI generation UI" class="object-cover w-full h-full group-hover:scale-105 transition-transform duration-700" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA9RiSFVKKrr-vvLLloRAfs4vvVuXR0-OeOozWroiCsSIre4y_u2RBweN5W5yIGjo-AKRtgqWFaMfWcp-9j992m0g-Pbp19JGi1v_ymAxou4ToR4ekApGW5sDNAcD1ethLAXxjAGR6oGV1n5kMS-2KFUArcCjBHNFXktfO55XggXNb272D_feFB_f5J7Uv4VMypxy7zZMwQmJ9CVketKoz6hwinGk6kKVI9TSmW6kMx1fG6AkWiaOrVWsTB23Sknxw5tuCwaMxn77n4"/>
+</div>
+</div>
+<div class="md:col-span-2 bg-primary text-white p-8 rounded-3xl shadow-sm flex flex-col justify-center relative overflow-hidden group">
+<div class="relative z-10">
+<h3 class="text-2xl font-bold mb-2">Support for PDFs &amp; Notes</h3>
+<p class="text-blue-50 text-lg opacity-90">Universal format support. Whether it's a 200-page textbook or a napkin sketch, we process it.</p>
+</div>
+<span class="material-symbols-outlined absolute -bottom-4 -right-4 text-[120px] opacity-10 group-hover:scale-110 transition-transform">description</span>
+</div>
+<div class="bg-white dark:bg-slate-800 p-8 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-700 flex flex-col justify-between">
+<div class="w-10 h-10 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 rounded-xl flex items-center justify-center">
+<span class="material-symbols-outlined">bolt</span>
+</div>
+<div>
+<h3 class="text-xl font-bold mb-1">Instant Feedback</h3>
+<p class="text-sm text-slate-500 dark:text-slate-400">Get explanations for every answer, the moment you submit.</p>
+</div>
+</div>
+<div class="bg-slate-900 text-white p-8 rounded-3xl shadow-sm flex flex-col justify-between">
+<div class="w-10 h-10 bg-slate-800 text-white rounded-xl flex items-center justify-center">
+<span class="material-symbols-outlined">analytics</span>
+</div>
+<div>
+<h3 class="text-xl font-bold mb-1">Progress Tracking</h3>
+<p class="text-sm text-slate-400">Visualize your mastery growth over time.</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section class="py-24" id="pricing">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+<div class="text-center mb-16">
+<h2 class="serif-heading text-4xl md:text-5xl mb-4">Start mastering for free</h2>
+<p class="text-slate-600 dark:text-slate-400">Choose the plan that fits your study load.</p>
+</div>
+<div class="grid md:grid-cols-3 gap-8 items-stretch">
+<div class="p-8 rounded-3xl border border-slate-200 dark:border-slate-800 flex flex-col">
+<h3 class="text-lg font-bold mb-2 text-slate-500">Free</h3>
+<p class="text-sm text-slate-400 mb-6">For casual study sessions.</p>
+<div class="text-4xl font-bold mb-6">$0<span class="text-lg font-normal text-slate-400">/mo</span></div>
+<ul class="space-y-4 mb-8 flex-grow">
+<li class="flex items-center gap-3 text-sm"><span class="material-symbols-outlined text-primary text-lg">check_circle</span> 3 uploads per month</li>
+<li class="flex items-center gap-3 text-sm"><span class="material-symbols-outlined text-primary text-lg">check_circle</span> Basic test generation</li>
+<li class="flex items-center gap-3 text-sm"><span class="material-symbols-outlined text-primary text-lg">check_circle</span> 24h test history</li>
+</ul>
+<button class="w-full py-3 rounded-full border border-slate-200 dark:border-slate-700 font-semibold hover:bg-slate-50 dark:hover:bg-slate-800 transition-all">Get started</button>
+</div>
+<div class="p-8 rounded-3xl border-2 border-primary bg-white dark:bg-slate-800 shadow-2xl shadow-primary/10 flex flex-col relative">
+<div class="absolute -top-4 left-1/2 -translate-x-1/2 bg-primary text-white text-xs font-bold uppercase tracking-widest px-4 py-1 rounded-full">Recommended</div>
+<h3 class="text-lg font-bold mb-2">Pro</h3>
+<p class="text-sm text-slate-500 dark:text-slate-400 mb-6">For serious exam prep.</p>
+<div class="text-4xl font-bold mb-6">$9.99<span class="text-lg font-normal text-slate-400">/mo</span></div>
+<ul class="space-y-4 mb-8 flex-grow">
+<li class="flex items-center gap-3 text-sm font-medium"><span class="material-symbols-outlined text-primary text-lg">check_circle</span> Unlimited uploads</li>
+<li class="flex items-center gap-3 text-sm"><span class="material-symbols-outlined text-primary text-lg">check_circle</span> Priority AI generation</li>
+<li class="flex items-center gap-3 text-sm"><span class="material-symbols-outlined text-primary text-lg">check_circle</span> Advanced analytics</li>
+<li class="flex items-center gap-3 text-sm"><span class="material-symbols-outlined text-primary text-lg">check_circle</span> Export to PDF/Word</li>
+</ul>
+<button class="w-full py-3 bg-primary text-white rounded-full font-semibold hover:opacity-90 transition-all shadow-lg shadow-primary/20">Go Premium</button>
+</div>
+<div class="p-8 rounded-3xl border border-slate-200 dark:border-slate-800 flex flex-col">
+<h3 class="text-lg font-bold mb-2 text-slate-500">Institution</h3>
+<p class="text-sm text-slate-400 mb-6">For schools and teams.</p>
+<div class="text-4xl font-bold mb-6">$19.99<span class="text-lg font-normal text-slate-400">/user</span></div>
+<ul class="space-y-4 mb-8 flex-grow">
+<li class="flex items-center gap-3 text-sm"><span class="material-symbols-outlined text-primary text-lg">check_circle</span> Admin dashboard</li>
+<li class="flex items-center gap-3 text-sm"><span class="material-symbols-outlined text-primary text-lg">check_circle</span> Shared question banks</li>
+<li class="flex items-center gap-3 text-sm"><span class="material-symbols-outlined text-primary text-lg">check_circle</span> SSO &amp; LMS integration</li>
+</ul>
+<button class="w-full py-3 rounded-full border border-slate-200 dark:border-slate-700 font-semibold hover:bg-slate-50 dark:hover:bg-slate-800 transition-all">Contact Sales</button>
+</div>
+</div>
+</div>
+</section>
+<section class="py-24 bg-primary text-white overflow-hidden relative">
+<div class="max-w-4xl mx-auto px-4 text-center relative z-10">
+<h2 class="serif-heading text-5xl md:text-6xl mb-8 leading-tight">Join thousands of students <br/>studying smarter.</h2>
+<button class="px-10 py-5 bg-white text-primary rounded-full text-xl font-bold hover:scale-105 transition-transform shadow-xl">
+            Create Your First Test
+        </button>
+<div class="mt-12 flex justify-center items-center gap-8 opacity-70 grayscale contrast-125 brightness-200">
+<span class="text-xl font-bold font-serif">Harvard</span>
+<span class="text-xl font-bold font-serif">UPenn</span>
+<span class="text-xl font-bold font-serif">Cambridge</span>
+</div>
+</div>
+<div class="absolute bottom-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-white/20 blur-[100px] rounded-full"></div>
+</section>
+<footer class="bg-white dark:bg-black py-16 border-t border-slate-100 dark:border-slate-900">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+<div class="grid grid-cols-2 md:grid-cols-5 gap-12 mb-12">
+<div class="col-span-2">
+<div class="flex items-center gap-2 mb-6">
+<div class="w-7 h-7 bg-primary rounded-lg flex items-center justify-center text-white">
+<span class="material-symbols-outlined text-sm">auto_fix_high</span>
+</div>
+<span class="text-xl font-bold tracking-tighter">DUPI</span>
+</div>
+<p class="text-slate-500 dark:text-slate-400 max-w-xs mb-6 text-sm leading-relaxed">
+                    DUPI is building the future of personalized learning through AI-driven assessment generation.
+                </p>
+<div class="flex gap-4">
+<a class="text-slate-400 hover:text-primary transition-colors" href="#"><span class="material-symbols-outlined">alternate_email</span></a>
+<a class="text-slate-400 hover:text-primary transition-colors" href="#"><span class="material-symbols-outlined">share</span></a>
+</div>
+</div>
+<div>
+<h4 class="font-bold mb-6 text-sm uppercase tracking-wider">Product</h4>
+<ul class="space-y-4 text-sm text-slate-500 dark:text-slate-400">
+<li><a class="hover:text-primary" href="#">Upload Notes</a></li>
+<li><a class="hover:text-primary" href="#">Quiz Generator</a></li>
+<li><a class="hover:text-primary" href="#">Pricing</a></li>
+</ul>
+</div>
+<div>
+<h4 class="font-bold mb-6 text-sm uppercase tracking-wider">Resources</h4>
+<ul class="space-y-4 text-sm text-slate-500 dark:text-slate-400">
+<li><a class="hover:text-primary" href="#">Blog</a></li>
+<li><a class="hover:text-primary" href="#">Study Tips</a></li>
+<li><a class="hover:text-primary" href="#">Success Stories</a></li>
+</ul>
+</div>
+<div>
+<h4 class="font-bold mb-6 text-sm uppercase tracking-wider">Legal</h4>
+<ul class="space-y-4 text-sm text-slate-500 dark:text-slate-400">
+<li><a class="hover:text-primary" href="#">Terms</a></li>
+<li><a class="hover:text-primary" href="#">Privacy</a></li>
+<li><a class="hover:text-primary" href="#">Help</a></li>
+</ul>
+</div>
+</div>
+<div class="pt-12 border-t border-slate-100 dark:border-slate-900 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-slate-400">
+<p>© 2024 DUPI AI. All rights reserved.</p>
+<div class="flex gap-6">
+<a class="hover:text-slate-600" href="#">Accessibility</a>
+<a class="hover:text-slate-600" href="#">Cookies</a>
+</div>
+</div>
+</div>
+</footer>
+</body></html>

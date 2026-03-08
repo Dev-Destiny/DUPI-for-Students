@@ -11,30 +11,30 @@ import Footer from "./components/layout/Footer";
 import WaitlistPage from "./pages/WaitlistPage";
 
 function Home() {
-  return (
-    <main className="min-h-screen bg-[#f8faf9] text-slate-900">
-      <Navbar />
-      <Hero />
-      <HowItWorks />
-      <Features />
-      <Testimonials />
-      <Pricing />
-      <CTA />
-      <Footer />
-    </main>
-  );
+	return (
+		<main className='min-h-screen bg-background text-foreground transition-colors duration-300'>
+			<Navbar />
+			<Hero />
+			<HowItWorks />
+			<Features />
+			<Testimonials />
+			<Pricing />
+			<CTA />
+			<Footer />
+		</main>
+	);
 }
 
 function App() {
-  return (
-    <BrowserRouter>
-      <Toaster position="top-center" />
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/waitlist" element={<WaitlistPage />} />
-      </Routes>
-    </BrowserRouter>
-  );
+	return (
+		<BrowserRouter>
+			<Toaster position='top-center' />
+			<Routes>
+				<Route path='/' element={<Home />} />
+				<Route path='/waitlist' element={<WaitlistPage />} />
+			</Routes>
+		</BrowserRouter>
+	);
 }
 
 export default App;
