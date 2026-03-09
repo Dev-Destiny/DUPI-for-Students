@@ -28,7 +28,11 @@ const Footer: FC = () => {
 						<div className='flex items-center gap-1 mb-6'>
 							<span className='font-grotesk font-bold tracking-tighter text-foreground text-2xl flex items-center gap-[3px]'>
 								dupi
-								<span className='w-2 h-2 rounded-full bg-brand-orange'></span>
+								<img
+									src='/image/dupi-mark.svg'
+									alt='DUPI logo'
+									className='h-5 w-5'
+								/>
 							</span>
 						</div>
 						<p className='text-muted-foreground max-w-xs mb-6 text-sm leading-relaxed'>

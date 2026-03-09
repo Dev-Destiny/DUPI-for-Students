@@ -12,6 +12,7 @@ import DocumentsPage from "./modules/home/documents/pages/DocumentsPage";
 import TestsPage from "./modules/home/tests/pages/TestsPage";
 import FlashcardsPage from "./modules/home/flashcards/pages/FlashcardsPage";
 import AnalyticsPage from "./modules/home/analytics/pages/AnalyticsPage";
+import SettingsPage from "./modules/home/settings/pages/SettingsPage";
 
 function App() {
 	const { checkAuth, isAuthenticated, user } = useAuthStore();
@@ -105,6 +106,16 @@ function App() {
 					<ProtectedRoute>
 						<HomeLayout>
 							<AnalyticsPage />
+						</HomeLayout>
+					</ProtectedRoute>
+				}
+			/>
+			<Route
+				path='/settings'
+				element={
+					<ProtectedRoute>
+						<HomeLayout>
+							<SettingsPage />
 						</HomeLayout>
 					</ProtectedRoute>
 				}

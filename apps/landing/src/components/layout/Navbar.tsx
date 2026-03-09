@@ -25,7 +25,11 @@ const Navbar: FC = () => {
 					>
 						<span className='font-grotesk font-bold tracking-tighter text-foreground text-3xl flex items-center gap-[4px]'>
 							dupi
-							<span className='w-2.5 h-2.5 rounded-full bg-brand-orange'></span>
+							<img
+								src='/image/dupi-mark.svg'
+								alt='DUPI logo'
+								className='h-6 w-6'
+							/>
 						</span>
 					</motion.a>
 
