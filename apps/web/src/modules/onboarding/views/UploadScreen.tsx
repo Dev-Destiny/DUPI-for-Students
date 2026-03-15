@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { FileText, Upload } from "lucide-react";
 import { OnboardingHeader } from "./OnboardingHeader";
 import { slide, USE_CASES } from "./constants";
+import { documentService } from "@/services/document.service";
 
 interface UploadScreenProps {
 	onFinish: () => void;
@@ -19,6 +20,7 @@ export const UploadScreen: FC<UploadScreenProps> = ({
 }) => {
 	const [dragging, setDragging] = useState(false);
 	const [file, setFile] = useState<File | null>(null);
+	const [isUploading, setIsUploading] = useState(false);
 	const inputRef = useRef<HTMLInputElement>(null);
 
 	const handleDrop = (e: React.DragEvent) => {
@@ -27,6 +29,30 @@ export const UploadScreen: FC<UploadScreenProps> = ({
 		const f = e.dataTransfer.files[0];
 		if (f) setFile(f);
 	};
+
+	const handleFinishSetup = async () => {
+		if (file) {
+			setIsUploading(true);
+			try {
+				await documentService.uploadDocument(file);
+				
+				// Upload successful, proceed to finish
+				setIsUploading(false);
+				onFinish();
+			} catch (error) {
+				console.error("Failed to upload document:", error);
+				setIsUploading(false);
+				// Depending on your error handling strategy, we can alert the user here
+				// alert("Failed to upload file. Please try again.");
+				return;
+			}
+		} else {
+			// No file to upload, just finish
+			onFinish();
+		}
+	};
+
+	const isProcessing = isLoading || isUploading;
 
 	return (
 		<motion.div
@@ -70,8 +96,8 @@ export const UploadScreen: FC<UploadScreenProps> = ({
 					}}
 					onDragLeave={() => setDragging(false)}
 					onDrop={handleDrop}
-					onClick={() => inputRef.current?.click()}
-					className={`w-full max-w-sm rounded-[2.5rem] border-2 border-dashed cursor-pointer p-12 flex flex-col items-center gap-4 transition-all duration-500 shadow-2xl shadow-black/20 ${
+					onClick={() => !isProcessing && inputRef.current?.click()}
+					className={`w-full max-w-sm rounded-[2.5rem] border-2 border-dashed ${isProcessing ? 'cursor-not-allowed opacity-70' : 'cursor-pointer'} p-12 flex flex-col items-center gap-4 transition-all duration-500 shadow-2xl shadow-black/20 ${
 						dragging
 							? "border-brand-orange bg-brand-orange/10 scale-105"
 							: file
@@ -89,6 +115,7 @@ export const UploadScreen: FC<UploadScreenProps> = ({
 								setFile(e.target.files[0]);
 							}
 						}}
+						disabled={isProcessing}
 					/>
 					<div className='w-16 h-16 rounded-2xl flex items-center justify-center bg-brand-orange/10 shadow-lg shadow-brand-orange/10'>
 						{file ? (
@@ -116,7 +143,8 @@ export const UploadScreen: FC<UploadScreenProps> = ({
 							</p>
 							<button
 								type='button'
-								className='mt-2 px-6 py-2 rounded-full border border-border text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground hover:bg-muted/50 hover:text-foreground transition-all'
+								disabled={isProcessing}
+								className='mt-2 px-6 py-2 rounded-full border border-border text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground hover:bg-muted/50 hover:text-foreground transition-all disabled:opacity-50'
 							>
 								Select File
 							</button>
@@ -146,19 +174,20 @@ export const UploadScreen: FC<UploadScreenProps> = ({
 				<div className='w-full max-w-sm flex items-center justify-between pt-6'>
 					<button
 						onClick={onSkip}
-						className='text-xs font-black uppercase tracking-widest text-muted-foreground hover:text-foreground transition-colors'
+						disabled={isProcessing}
+						className='text-xs font-black uppercase tracking-widest text-muted-foreground hover:text-foreground transition-colors disabled:opacity-30 disabled:cursor-not-allowed'
 					>
 						Skip tutorial
 					</button>
 					<motion.button
-						whileHover={{ scale: 1.05 }}
-						whileTap={{ scale: 0.95 }}
-						onClick={onFinish}
-						disabled={isLoading}
+						whileHover={!isProcessing ? { scale: 1.05 } : {}}
+						whileTap={!isProcessing ? { scale: 0.95 } : {}}
+						onClick={handleFinishSetup}
+						disabled={isProcessing}
 						className='flex items-center gap-2 px-8 py-3.5 rounded-full text-white font-bold text-sm shadow-xl shadow-brand-orange/20 disabled:opacity-30 disabled:cursor-not-allowed transition-all bg-brand-orange hover:bg-brand-orange/90'
 					>
-						{isLoading ? "Setting up..." : "Finish Set Up"}
-						{!isLoading && <Upload className='w-4 h-4' />}
+						{isUploading ? "Uploading..." : isLoading ? "Setting up..." : file ? "Upload & Finish" : "Finish Set Up"}
+						{!isProcessing && <Upload className='w-4 h-4' />}
 					</motion.button>
 				</div>
 			</div>

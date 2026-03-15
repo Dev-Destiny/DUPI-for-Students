@@ -1,4 +1,5 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
 	FileText,
@@ -34,6 +35,8 @@ interface DocumentCardProps {
 }
 
 export const DocumentCard: React.FC<DocumentCardProps> = ({ doc }) => {
+	const navigate = useNavigate();
+
 	return (
 		<motion.div
 			layout
@@ -43,7 +46,10 @@ export const DocumentCard: React.FC<DocumentCardProps> = ({ doc }) => {
 			whileHover={{ y: -8 }}
 			transition={{ type: "spring", stiffness: 300, damping: 25 }}
 		>
-			<Card className='group relative overflow-hidden h-full border-border bg-card shadow-lg shadow-black/5 hover:border-brand-orange/40 transition-all duration-300'>
+			<Card
+				className='group relative overflow-hidden h-full border-border bg-card shadow-lg shadow-black/5 hover:border-brand-orange/40 transition-all duration-300 cursor-pointer'
+				onClick={() => navigate(`/documents/${doc.id}`)}
+			>
 				<div className='p-5'>
 					{/* Header */}
 					<div className='flex items-start justify-between mb-4'>

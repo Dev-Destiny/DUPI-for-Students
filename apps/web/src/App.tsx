@@ -9,6 +9,7 @@ import ProtectedRoute from "./components/auth/ProtectedRoute";
 import HomeLayout from "./modules/home/layouts/HomeLayout";
 import DashboardPage from "./modules/home/dashboard/pages/DashboardPage";
 import DocumentsPage from "./modules/home/documents/pages/DocumentsPage";
+import DocumentDetailPage from "./modules/home/documents/pages/DocumentDetailPage";
 import TestsPage from "./modules/home/tests/pages/TestsPage";
 import FlashcardsPage from "./modules/home/flashcards/pages/FlashcardsPage";
 import AnalyticsPage from "./modules/home/analytics/pages/AnalyticsPage";
@@ -76,6 +77,16 @@ function App() {
 					<ProtectedRoute>
 						<HomeLayout>
 							<DocumentsPage />
+						</HomeLayout>
+					</ProtectedRoute>
+				}
+			/>
+			<Route
+				path='/documents/:id'
+				element={
+					<ProtectedRoute>
+						<HomeLayout>
+							<DocumentDetailPage />
 						</HomeLayout>
 					</ProtectedRoute>
 				}

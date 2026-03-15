@@ -1,8 +1,8 @@
-import { Request, Response, NextFunction } from "express";
+import { Request, Response, NextFunction, RequestHandler } from "express";
 import { verifyAccessToken } from "../utils/jwt";
 import { ApiError } from "../utils/ApiError";
 
-export const authenticate = (req: Request, res: Response, next: NextFunction) => {
+export const authenticate: RequestHandler = (req, res, next) => {
   const authHeader = req.headers.authorization;
   if (!authHeader?.startsWith("Bearer ")) {
     return next(new ApiError(401, "AUTH_REQUIRED", "Authentication required"));

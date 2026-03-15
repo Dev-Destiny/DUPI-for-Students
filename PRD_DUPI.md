@@ -130,7 +130,7 @@ DUPI is an AI-powered educational platform designed to centralize and optimize t
 
 ### Frontend
 
-| Component         | Technology            | Justification                                                  |
+| Component         | Technology            | Justification    |
 | ----------------- | --------------------- | -------------------------------------------------------------- |
 | Framework         | React.js 18+          | Component reusability, ecosystem maturity, concurrent features |
 | Type Safety       | TypeScript 5+         | Catch errors at compile-time, improved developer experience    |
@@ -174,7 +174,7 @@ DUPI is an AI-powered educational platform designed to centralize and optimize t
 | Relational Database | PostgreSQL 15+         | ACID compliance, robust querying, pgvector extension     |
 | ORM                 | Prisma                 | Type-safe database client, migration management          |
 | Authentication      | JWT + bcrypt           | Stateless auth, industry standard                        |
-| File Storage        | AWS S3 / Cloudflare R2 | Scalable object storage for user documents               |
+| File Storage        | Supabase Storage       | Scalable object storage for user documents               |
 | Validation          | Zod                    | Shared validation schemas with frontend                  |
 | Task Queue          | Bull (Redis-based)     | Background job processing for document parsing           |
 
@@ -189,8 +189,8 @@ DUPI is an AI-powered educational platform designed to centralize and optimize t
 
 ### DevOps & Infrastructure
 
-| Component          | Technology                             | Justification                                            |
-| ------------------ | -------------------------------------- | -------------------------------------------------------- |
+| Component          | Technology                             | Justification |
+| ------------------ | -------------------------------------- | ------------------------------------------------ |
 | Version Control    | Git + GitHub                           | Collaboration, CI/CD integration                         |
 | Package Manager    | pnpm                                   | Fast, disk-space efficient, strict dependency resolution |
 | CI/CD              | GitHub Actions                         | Native integration, free tier for private repos          |
@@ -257,7 +257,7 @@ DUPI is an AI-powered educational platform designed to centralize and optimize t
       │  Redis Cache       │   └────────────────────┘
       │  - Sessions        │   ┌────────────────────┐
       │  - API responses   │   │  Cloud Storage     │
-      │  - Rate limits     │   │  (S3/R2)           │
+      │  - Rate limits     │   │  (Supabase)        │
       └────────────────────┘   │  - PDF files       │
                                │  - User uploads    │
                                └────────────────────┘
@@ -271,7 +271,7 @@ DUPI is an AI-powered educational platform designed to centralize and optimize t
 
 1. **User uploads document** → Frontend sends file to `/api/documents/upload`
 2. **Backend validates file** → Check file type, size, virus scan
-3. **Store in cloud** → Upload to S3/R2, get URL
+3. **Store in cloud** → Upload to Supabase Storage, get URL
 4. **Queue processing** → Add job to Bull queue for async processing
 5. **Extract text** → Worker processes document, extracts text
 6. **Generate embeddings** → Chunk text, send to embedding API
@@ -1170,11 +1170,10 @@ REFRESH_TOKEN_EXPIRES_IN=7d
 OPENAI_API_KEY=sk-...
 ANTHROPIC_API_KEY=sk-ant-...
 
-# Storage
-AWS_ACCESS_KEY_ID=...
-AWS_SECRET_ACCESS_KEY=...
-AWS_BUCKET_NAME=dupi-documents
-AWS_REGION=us-east-1
+# Storage (Supabase)
+SUPABASE_URL=https://your-project-url.supabase.co
+SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
+SUPABASE_BUCKET_NAME=documents
 
 # ChromaDB
 CHROMA_HOST=localhost
@@ -1254,7 +1253,7 @@ dupi/
 
 | Version | Date        | Changes                                                                        | Author        |
 | ------- | ----------- | ------------------------------------------------------------------------------ | ------------- |
-| 1.0     | Feb 8, 2026 | Initial PRD creation                                                           | Adesina Sodiq |
+| 1.0     | Feb 8, 2026 | Initial PRD creation                                                           | Adesina Destiny |
 | 1.1     | Mar 8, 2026 | Added Midnight Academic Theme, Framer Motion mandate, and Modular Architecture | Antigravity   |
 
 ---

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
 	FileText,
@@ -11,60 +11,63 @@ import {
 import { Button, Input, ScrollArea } from "@dupi/ui";
 import { DocumentCard } from "../components/DocumentCard";
 import { DocumentsSidebar } from "../components/DocumentsSidebar";
+import { UploadModal } from "../components/UploadModal";
+import { documentService } from "@/services/document.service";
 
-// Mock data for demonstration
-const MOCK_DOCS = [
-	{
-		id: "1",
-		title: "Biology Chapter 12.pdf",
-		size: "3.2MB",
-		pages: 24,
-		status: "processed",
-		uploadedAt: "2 hours ago",
-		type: "pdf",
-	},
-	{
-		id: "2",
-		title: "Organic Chem Intro.docx",
-		size: "5.1MB",
-		pages: null,
-		status: "analyzing",
-		progress: 67,
-		uploadedAt: "Processing",
-		type: "docx",
-	},
-	{
-		id: "3",
-		title: "History Essay Draft.pdf",
-		size: "1.2MB",
-		pages: 8,
-		status: "error",
-		uploadedAt: "Yesterday",
-		type: "pdf",
-	},
-	{
-		id: "4",
-		title: "Psychology Notes.pdf",
-		size: "1.8MB",
-		pages: 10,
-		status: "processed",
-		uploadedAt: "2 days ago",
-		type: "pdf",
-	},
-	{
-		id: "5",
-		title: "Calculus 1 Review.pdf",
-		size: "4.5MB",
-		pages: 30,
-		status: "processed",
-		uploadedAt: "3 days ago",
-		type: "pdf",
-	},
-];
-
+interface DocumentData {
+	id: string;
+	title: string;
+	size: string;
+	pages: number | null;
+	status: string;
+	uploadedAt: string;
+	type: string;
+	progress?: number;
+}
 const DocumentsPage: React.FC = () => {
 	const [searchQuery, setSearchQuery] = useState("");
 	const [view, setView] = useState<"grid" | "list">("grid");
+	const [documents, setDocuments] = useState<DocumentData[]>([]);
+	const [isLoading, setIsLoading] = useState(true);
+	const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
+
+	const fetchDocuments = async () => {
+		try {
+			setIsLoading(true);
+			const docs = await documentService.getDocuments();
+			const formatted = docs.map((doc: any) => ({
+				id: doc.id,
+				title: doc.title,
+				size: doc.fileSizeBytes 
+					? (doc.fileSizeBytes / 1024 / 1024).toFixed(1) + "MB" 
+					: "Unknown",
+				pages: null,
+				status: doc.processed 
+					? "processed" 
+					: (doc.processingError ? "error" : "analyzing"),
+				uploadedAt: new Date(doc.createdAt).toLocaleDateString(),
+				type: doc.title.split('.').pop() || "doc",
+				progress: doc.processed ? 100 : 50,
+			}));
+			setDocuments(formatted);
+		} catch (error) {
+			console.error("Failed to fetch documents:", error);
+		} finally {
+			setIsLoading(false);
+		}
+	};
+
+	useEffect(() => {
+		fetchDocuments();
+	}, []);
+
+	const filteredDocs = documents.filter((doc) =>
+		doc.title.toLowerCase().includes(searchQuery.toLowerCase())
+	);
+
+	const handleUploadDocument = () => {
+		setIsUploadModalOpen(true);
+	};
 
 	return (
 		<div className='flex h-full bg-background overflow-hidden font-grotesk'>
@@ -87,7 +90,10 @@ const DocumentsPage: React.FC = () => {
 								</p>
 							</div>
 
-							<Button className='h-11 rounded-full px-6 gap-2 font-bold shadow-lg shadow-brand-orange/10 transition-all hover:scale-105 active:scale-95'>
+							<Button 
+								onClick={handleUploadDocument}
+								className='h-11 rounded-full px-6 gap-2 font-bold shadow-lg shadow-brand-orange/10 transition-all hover:scale-105 active:scale-95'
+							>
 								<Plus className='size-4' />
 								Upload Document
 							</Button>
@@ -131,19 +137,25 @@ const DocumentsPage: React.FC = () => {
 						</div>
 
 						{/* Documents Grid */}
-						<motion.div
-							layout
-							className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6'
-						>
-							<AnimatePresence>
-								{MOCK_DOCS.map((doc) => (
-									<DocumentCard key={doc.id} doc={doc} />
-								))}
-							</AnimatePresence>
-						</motion.div>
+						{isLoading ? (
+							<div className='flex items-center justify-center py-24'>
+								<p className='text-muted-foreground font-black uppercase tracking-widest text-xs animate-pulse'>Loading Documents...</p>
+							</div>
+						) : (
+							<motion.div
+								layout
+								className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6'
+							>
+								<AnimatePresence>
+									{filteredDocs.map((doc) => (
+										<DocumentCard key={doc.id} doc={doc} />
+									))}
+								</AnimatePresence>
+							</motion.div>
+						)}
 
 						{/* Empty State (If needed) */}
-						{MOCK_DOCS.length === 0 && (
+						{!isLoading && filteredDocs.length === 0 && (
 							<div className='flex flex-col items-center justify-center py-24 text-center space-y-5'>
 								<div className='w-24 h-24 bg-muted rounded-full flex items-center justify-center shadow-inner'>
 									<FileText className='size-10 text-muted-foreground/30' />
@@ -170,6 +182,14 @@ const DocumentsPage: React.FC = () => {
 			</div>
 
 			<DocumentsSidebar />
+			
+			<UploadModal 
+				isOpen={isUploadModalOpen} 
+				onClose={() => setIsUploadModalOpen(false)} 
+				onUploadComplete={() => {
+					fetchDocuments();
+				}}
+			/>
 		</div>
 	);
 };
