@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { X, Upload, FileText, CheckCircle2, AlertCircle } from "lucide-react";
 import { Button } from "@dupi/ui";
 import { documentService } from "@/services/document.service";
+import { toast } from "sonner";
 
 interface UploadModalProps {
 	isOpen: boolean;
@@ -45,13 +46,15 @@ export const UploadModal: React.FC<UploadModalProps> = ({
 			await documentService.uploadDocument(file);
 
 			setStatus("success");
+			toast.success(`${file.name} uploaded successfully!`);
 			setTimeout(() => {
 				onUploadComplete();
 				handleClose();
-			}, 1500); // Wait a bit to show success state before closing
+			}, 1500); 
 		} catch (error) {
 			console.error("Failed to upload document:", error);
 			setStatus("error");
+			toast.error(`Failed to upload ${file.name}`);
 		}
 	};
 

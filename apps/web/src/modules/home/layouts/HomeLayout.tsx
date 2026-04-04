@@ -1,5 +1,6 @@
 import * as React from "react";
 import { Link, useLocation } from "react-router-dom";
+import { motion } from "framer-motion";
 import {
 	LayoutDashboard,
 	FileText,
@@ -178,16 +179,94 @@ function NavUser() {
 	);
 }
 
+function MobileBottomNav() {
+	const location = useLocation();
+	const { setOpenMobile } = useSidebar();
+
+	return (
+		<motion.div 
+			initial={{ y: 100, opacity: 0 }}
+			animate={{ y: 0, opacity: 1 }}
+			transition={{ type: "spring", stiffness: 260, damping: 20, delay: 0.5 }}
+			className='md:hidden fixed inset-x-0 bottom-6 z-50 flex justify-center px-4'
+		>
+			<div className='w-full max-w-sm bg-card/90 backdrop-blur-2xl border border-border/50 shadow-2xl rounded-3xl p-2 px-4 flex items-center justify-around'>
+				{[...navMain, { title: "More", url: "#more", icon: ChevronUp }].map(
+					(item) => {
+						const isActive = location.pathname === item.url;
+						const isMore = item.title === "More";
+
+						return (
+							<React.Fragment key={item.title}>
+								{isMore ? (
+									<button 
+										onClick={() => setOpenMobile(true)}
+										className='flex flex-col items-center gap-1 p-2 transition-all duration-300'
+									>
+										<div className='relative'>
+											<item.icon className='size-5 text-muted-foreground' />
+										</div>
+										<span className='text-[8px] font-black uppercase tracking-widest text-muted-foreground'>
+											Menu
+										</span>
+									</button>
+								) : (
+									<Link
+										to={item.url}
+										className='flex flex-col items-center gap-1 p-2 transition-all duration-300'
+									>
+										<div className='relative'>
+											<item.icon
+												className={`size-5 transition-colors duration-300 ${
+													isActive
+														? "text-brand-orange"
+														: "text-muted-foreground"
+												}`}
+											/>
+											{isActive && (
+												<motion.div
+													layoutId='active-dot'
+													className='absolute -bottom-1 left-1/2 -translate-x-1/2 size-1 rounded-full bg-brand-orange shadow-[0_0_8px_rgba(255,111,32,0.6)]'
+												/>
+											)}
+										</div>
+										<span
+											className={`text-[8px] font-black uppercase tracking-widest transition-colors duration-300 ${
+												isActive
+													? "text-brand-orange"
+													: "text-muted-foreground"
+											}`}
+										>
+											{item.title}
+										</span>
+									</Link>
+								)}
+							</React.Fragment>
+						);
+					},
+				)}
+			</div>
+		</motion.div>
+	);
+}
+
 export default function HomeLayout({
 	children,
 }: {
 	children: React.ReactNode;
 }) {
 	const location = useLocation();
+	const { isMobile, setOpenMobile } = useSidebar();
+
+	React.useEffect(() => {
+		if (isMobile) {
+			setOpenMobile(false);
+		}
+	}, [location.pathname, isMobile, setOpenMobile]);
 
 	return (
 		<SidebarProvider defaultOpen={true}>
-			<div className='flex min-h-svh w-full bg-background'>
+			<div className='flex min-h-svh w-full bg-background relative'>
 				<Sidebar collapsible='icon' className='border-r border-border'>
 					<SidebarHeader className='h-16 flex items-center px-4'>
 						<Link
@@ -293,29 +372,46 @@ export default function HomeLayout({
 					</SidebarFooter>
 				</Sidebar>
 
-				<main className='flex flex-1 flex-col overflow-hidden bg-background'>
-					<header className='flex h-16 shrink-0 items-center gap-2 border-b border-border px-4 bg-background/80 backdrop-blur-md z-10 sticky top-0'>
-						<SidebarTrigger className='-ml-1' />
-						<Separator
-							orientation='vertical'
-							className='mr-2 h-4'
-						/>
+				<main className='flex flex-1 flex-col overflow-hidden bg-background relative mb-24 md:mb-0'>
+					<header className='flex h-12 md:h-16 shrink-0 items-center justify-between md:justify-start gap-2 border-b border-border px-4 bg-background/80 backdrop-blur-md z-10 sticky top-0'>
 						<div className='flex items-center gap-2'>
-							<span className='text-xs font-bold text-muted-foreground uppercase tracking-widest font-grotesk'>
-								Hub
-							</span>
-							<span className='text-border'>/</span>
-							<span className='text-xs font-black text-foreground uppercase tracking-widest font-grotesk'>
-								{location.pathname.split("/").pop() ||
-									"Dashboard"}
-							</span>
+							<SidebarTrigger className='-ml-1 md:flex hidden' />
+							<div className='md:hidden flex h-7 w-7 items-center justify-center rounded bg-brand-orange text-white shrink-0'>
+								<Zap className='size-3.5 fill-current' />
+							</div>
+							<Separator
+								orientation='vertical'
+								className='mr-2 h-4 md:block hidden'
+							/>
+							<div className='flex items-center gap-1 md:gap-2'>
+								<span className='text-[10px] md:text-xs font-bold text-muted-foreground uppercase tracking-widest font-grotesk'>
+									Hub
+								</span>
+								<span className='text-border'>/</span>
+								<span className='text-[10px] md:text-xs font-black text-foreground uppercase tracking-widest font-grotesk truncate max-w-[100px]'>
+									{location.pathname.split("/").pop() ||
+										"Dashboard"}
+								</span>
+							</div>
+						</div>
+
+						{/* Small Profile on Mobile Topbar */}
+						<div className='md:hidden'>
+							<Avatar className='h-7 w-7 rounded-full border border-border shadow-sm'>
+								<AvatarFallback className='text-[10px] bg-brand-orange/10 text-brand-orange'>
+									JD
+								</AvatarFallback>
+							</Avatar>
 						</div>
 					</header>
-					<div className='flex flex-1 flex-col overflow-hidden'>
-						{children}
+					<div className='flex flex-1 flex-col overflow-hidden items-center'>
+						<div className='w-full max-w-7xl px-4 md:px-8 py-4 md:py-6'>
+							{children}
+						</div>
 					</div>
 				</main>
 			</div>
+			<MobileBottomNav />
 		</SidebarProvider>
 	);
 }

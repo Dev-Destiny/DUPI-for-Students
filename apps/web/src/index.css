@@ -30,41 +30,41 @@
 		--destructive: 0 84.2% 60.2%;
 		--destructive-foreground: 0 0% 98%;
 
-		--border: 240 5.9% 90%;
-		--input: 240 5.9% 90%;
+		--border: 60 5% 90%;
+		--input: 60 5% 90%;
 		--ring: 22 100% 56%;
 
-		--radius: 0.75rem;
+		--radius: 1rem;
 	}
 
 	.dark {
-		/* DUPI Midnight Dark (Elite Charcoal) */
-		--background: 240 10% 3.9%; /* #09090B */
-		--foreground: 0 0% 98%;
+		/* DUPI Midnight Dark (Soft Charcoal) */
+		--background: 24 9.8% 10%; /* #1c1917 / stone-950 approx */
+		--foreground: 60 9.1% 97.8%;
 
-		--card: 240 10% 6%; /* #101012 */
-		--card-foreground: 0 0% 98%;
+		--card: 24 9.8% 12%; 
+		--card-foreground: 60 9.1% 97.8%;
 
-		--popover: 240 10% 3.9%;
-		--popover-foreground: 0 0% 98%;
+		--popover: 24 9.8% 10%;
+		--popover-foreground: 60 9.1% 97.8%;
 
 		--primary: 22 100% 56%;
 		--primary-foreground: 0 0% 100%;
 
-		--secondary: 240 3.7% 15.9%;
-		--secondary-foreground: 0 0% 98%;
+		--secondary: 24 9.8% 16%;
+		--secondary-foreground: 60 9.1% 97.8%;
 
-		--accent: 240 3.7% 15.9%;
-		--accent-foreground: 0 0% 98%;
+		--accent: 24 9.8% 16%;
+		--accent-foreground: 60 9.1% 97.8%;
 
-		--muted: 240 3.7% 15.9%;
-		--muted-foreground: 240 5% 64.9%;
+		--muted: 24 9.8% 16%;
+		--muted-foreground: 24 5.4% 63.9%;
 
 		--destructive: 0 62.8% 30.6%;
-		--destructive-foreground: 0 0% 98%;
+		--destructive-foreground: 60 9.1% 97.8%;
 
-		--border: 240 3.7% 15.9%;
-		--input: 240 3.7% 15.9%;
+		--border: 24 9.8% 16%;
+		--input: 24 9.8% 16%;
 		--ring: 22 100% 56%;
 	}
 }
@@ -162,5 +162,32 @@
 		50% {
 			box-shadow: 0 0 40px rgba(98, 16, 159, 0.2);
 		}
+	}
+
+	/* Soft diffused shadow in Anthropic vibe */
+	.shadow-soft {
+		box-shadow: 0 8px 30px rgba(0, 0, 0, 0.04), 0 4px 10px rgba(0, 0, 0, 0.02);
+	}
+	
+	.dark .shadow-soft {
+		box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3), 0 4px 10px rgba(0, 0, 0, 0.15);
+	}
+
+	/* 3D Transform Utilities for Flashcards */
+	.perspective-1000 {
+		perspective: 1000px;
+	}
+
+	.preserve-3d {
+		transform-style: preserve-3d;
+	}
+
+	.backface-hidden {
+		backface-visibility: hidden;
+		-webkit-backface-visibility: hidden;
+	}
+
+	.rotate-y-180 {
+		transform: rotateY(180deg);
 	}
 }

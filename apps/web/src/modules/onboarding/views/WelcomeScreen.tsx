@@ -14,7 +14,7 @@ export const WelcomeScreen: FC<{ onNext: () => void; onSkip: () => void }> = ({
 		initial='initial'
 		animate='animate'
 		exit='exit'
-		className='flex flex-col min-h-screen bg-background relative overflow-hidden'
+		className='flex flex-col min-h-screen w-full bg-background relative overflow-hidden'
 	>
 		<OnboardingHeader step={1} onSkip={onSkip} />
 

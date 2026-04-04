@@ -8,10 +8,10 @@ interface AuthLayoutProps {
 
 const AuthLayout: FC<AuthLayoutProps> = ({ children }) => {
 	return (
-		<div className='min-h-screen flex flex-col justify-center items-center bg-background auth-bg-pattern px-6 py-12 relative overflow-hidden'>
+		<div className='min-h-screen w-full flex flex-col justify-center items-center bg-background auth-bg-pattern px-6 py-12 relative overflow-hidden'>
 			{/* Decorative background elements - purely visual now */}
 			<motion.div
-				className='absolute top-[-10%] left-[-5%] w-[50%] h-[50%] bg-brand-orange/5 rounded-full blur-[120px]'
+				className='absolute top-[-10%] left-[-5%] w-[50%] h-[50%] bg-brand-orange/5 rounded-full blur-[120px] will-change-transform'
 				animate={{
 					scale: [1, 1.1, 1],
 					opacity: [0.2, 0.4, 0.2],
@@ -23,7 +23,7 @@ const AuthLayout: FC<AuthLayoutProps> = ({ children }) => {
 				}}
 			/>
 			<motion.div
-				className='absolute bottom-[-10%] right-[-5%] w-[50%] h-[50%] bg-brand-violet/5 rounded-full blur-[120px]'
+				className='absolute bottom-[-10%] right-[-5%] w-[50%] h-[50%] bg-brand-violet/5 rounded-full blur-[120px] will-change-transform'
 				animate={{
 					scale: [1.1, 1, 1.1],
 					opacity: [0.2, 0.3, 0.2],
@@ -81,24 +81,24 @@ const AuthLayout: FC<AuthLayoutProps> = ({ children }) => {
 			>
 				<p className='mb-4'>© 2026 DUPI AI Technologies</p>
 				<div className='flex justify-center gap-6'>
-					<a
-						href='#'
+					<Link
+						to='/help'
 						className='hover:text-brand-orange transition-colors duration-200'
 					>
 						Help
-					</a>
-					<a
-						href='#'
+					</Link>
+					<Link
+						to='/security'
 						className='hover:text-brand-orange transition-colors duration-200'
 					>
 						Security
-					</a>
-					<a
-						href='#'
+					</Link>
+					<Link
+						to='/contact'
 						className='hover:text-brand-orange transition-colors duration-200'
 					>
 						Contact
-					</a>
+					</Link>
 				</div>
 			</motion.div>
 		</div>

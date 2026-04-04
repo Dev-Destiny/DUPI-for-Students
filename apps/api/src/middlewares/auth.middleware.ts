@@ -11,7 +11,7 @@ export const authenticate: RequestHandler = (req, res, next) => {
   const token = authHeader.split(" ")[1];
   try {
     const payload = verifyAccessToken(token);
-    req.user = payload as any;
+    req.user = payload;
     next();
   } catch (error) {
     next(new ApiError(401, "AUTH_INVALID_TOKEN", "Invalid or expired access token"));

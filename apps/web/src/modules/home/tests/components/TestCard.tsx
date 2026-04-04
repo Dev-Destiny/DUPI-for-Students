@@ -18,6 +18,8 @@ import {
 	DropdownMenuSeparator,
 } from "@dupi/ui";
 
+import { useNavigate } from "react-router-dom";
+
 interface Test {
 	id: string;
 	title: string;
@@ -34,6 +36,11 @@ interface TestCardProps {
 }
 
 export const TestCard: React.FC<TestCardProps> = ({ test }) => {
+	const navigate = useNavigate();
+	
+	const handleStart = () => {
+		navigate(`/tests/${test.id}`);
+	};
 	const getDifficultyColor = (diff: string) => {
 		switch (diff) {
 			case "easy":
@@ -66,8 +73,9 @@ export const TestCard: React.FC<TestCardProps> = ({ test }) => {
 			whileHover={{ y: -4 }}
 			transition={{ type: "spring", stiffness: 300, damping: 25 }}
 			className='h-full'
+			onClick={handleStart}
 		>
-			<Card className='group relative overflow-hidden h-full border-border bg-card shadow-lg shadow-black/5 hover:border-brand-orange/40 transition-all duration-300 flex flex-col'>
+			<Card className='group relative cursor-pointer overflow-hidden h-full border-border bg-card shadow-lg shadow-black/5 hover:border-brand-orange/40 transition-all duration-300 flex flex-col'>
 				<div className='p-5 flex-1 flex flex-col'>
 					{/* Header Actions */}
 					<div className='flex items-start justify-between mb-4'>

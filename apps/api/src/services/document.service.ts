@@ -2,6 +2,7 @@ import { supabaseAdmin } from "../utils/supabase";
 import prisma from "../lib/prisma";
 import { ApiError } from "../utils/ApiError";
 import crypto from "crypto";
+import { connection as redis } from "../utils/redis";
 
 /**
  * Uploads a document to Supabase and creates a Prisma record.
@@ -44,11 +45,18 @@ export const uploadAndCreateDocument = async (file: Express.Multer.File, userId:
 			userId,
 			title: originalname,
 			fileUrl,
+			storagePath: uploadData.path,
 			fileType: mimetype,
 			fileSizeBytes: size,
 			processed: false,
 		},
 	});
+
+	// Dispatch background task to Python Processor via Redis List
+	await redis.lpush("dupi_jobs", JSON.stringify({
+		documentId: newDocument.id,
+		userId
+	}));
 
 	return newDocument;
 };
@@ -89,15 +97,20 @@ export const deleteDocument = async (id: string, userId: string) => {
 	try {
 		const bucketName = process.env.SUPABASE_BUCKET_NAME || "documents";
 		
-		// The fileUrl ends with .../public/documents/userId/uuid.pdf
-		// We want to extract just the path inside the bucket: "userId/uuid.pdf"
-		const urlParts = document.fileUrl.split('/');
-		const filename = urlParts.pop();
-		const folderId = urlParts.pop();
+		const storagePath = document.storagePath;
 		
-		if (filename && folderId) {
-			const storagePath = `${folderId}/${filename}`;
+		if (storagePath) {
 			await supabaseAdmin.storage.from(bucketName).remove([storagePath]);
+		} else {
+			// Fallback for older records without storagePath
+			const urlParts = document.fileUrl.split('/');
+			const filename = urlParts.pop();
+			const folderId = urlParts.pop();
+			
+			if (filename && folderId) {
+				const fallbackPath = `${folderId}/${filename}`;
+				await supabaseAdmin.storage.from(bucketName).remove([fallbackPath]);
+			}
 		}
 	} catch (error) {
 		console.error("Supabase Deletion Error:", error);
@@ -108,4 +121,34 @@ export const deleteDocument = async (id: string, userId: string) => {
 	return await prisma.document.delete({
 		where: { id },
 	});
+};
+
+/**
+ * Downloads a document buffer from Supabase storage.
+ */
+export const getDocumentBuffer = async (documentId: string, userId: string) => {
+	const document = await getDocumentById(documentId, userId);
+	const bucketName = process.env.SUPABASE_BUCKET_NAME || "documents";
+	let storagePath = document.storagePath;
+
+	if (!storagePath) {
+		// Fallback for older records
+		const urlParts = document.fileUrl.split(`/public/${bucketName}/`);
+		storagePath = urlParts[1];
+	}
+
+	if (!storagePath) {
+		throw new ApiError(500, "STORAGE_ERROR", "Could not resolve storage path from URL.");
+	}
+
+	const { data, error } = await supabaseAdmin.storage
+		.from(bucketName)
+		.download(storagePath);
+
+	if (error) {
+		console.error("Supabase Download Error:", error);
+		throw new ApiError(500, "STORAGE_ERROR", "Failed to download file from cloud storage.");
+	}
+
+	return Buffer.from(await data.arrayBuffer());
 };

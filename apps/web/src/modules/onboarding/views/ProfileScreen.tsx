@@ -53,7 +53,7 @@ export const ProfileScreen: FC<ProfileScreenProps> = ({
 			initial='initial'
 			animate='animate'
 			exit='exit'
-			className='flex flex-col min-h-screen bg-background'
+			className='flex flex-col min-h-screen w-full bg-background'
 		>
 			<OnboardingHeader step={2} onSkip={onSkip} onBack={onBack} />
 

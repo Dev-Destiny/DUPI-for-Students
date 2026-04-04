@@ -55,7 +55,7 @@ const OnboardingPage: FC = () => {
 	};
 
 	return (
-		<div className='relative font-grotesk'>
+		<div className='relative font-grotesk min-h-screen w-full flex flex-col items-center justify-center'>
 			<AnimatePresence mode='wait'>
 				{step === 1 && (
 					<WelcomeScreen

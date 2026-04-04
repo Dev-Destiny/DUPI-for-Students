@@ -1,79 +1,62 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Input } from "@dupi/ui";
 import { Filter, Search, Layers } from "lucide-react";
 import { FlashcardSetCard } from "../components/FlashcardSetCard";
-
-// Mock Data
-const mockFlashcardSets = [
-	{
-		id: "1",
-		title: "Cellular Respiration Final Review",
-		documentName: "Biology Ch 12.pdf",
-		cardsCount: 45,
-		mastery: 85,
-		status: "learning" as const,
-		lastReviewed: "2 hours ago",
-		dueForReview: 12,
-	},
-	{
-		id: "2",
-		title: "Node.js Fundamentals",
-		documentName: "Intro to Node.js and Express.docx",
-		cardsCount: 30,
-		mastery: 100,
-		status: "mastered" as const,
-		lastReviewed: "Yesterday",
-		dueForReview: 0,
-	},
-	{
-		id: "3",
-		title: "Advanced React Context API",
-		documentName: "React Advanced Patterns.txt",
-		cardsCount: 20,
-		mastery: 15,
-		status: "learning" as const,
-		lastReviewed: "3 days ago",
-		dueForReview: 20,
-	},
-	{
-		id: "4",
-		title: "SQL Joins Practice",
-		documentName: "Database Schema Overview.pdf",
-		cardsCount: 25,
-		mastery: 0,
-		status: "new" as const,
-		dueForReview: 0,
-	},
-	{
-		id: "5",
-		title: "World War 2 History Dates",
-		documentName: "WW2 History.pdf",
-		cardsCount: 60,
-		mastery: 45,
-		status: "learning" as const,
-		lastReviewed: "Last week",
-		dueForReview: 5,
-	},
-	{
-		id: "6",
-		title: "Basic Mathematics Algebra",
-		documentName: "Algebra 101.pdf",
-		cardsCount: 15,
-		mastery: 90,
-		status: "mastered" as const,
-		lastReviewed: "1 month ago",
-		dueForReview: 2,
-	},
-];
+import { flashcardService } from "@/services/flashcard.service";
+import { GenerationModal } from "@/components/modals/GenerationModal";
 
 const Tabs = ["All Decks", "Due for Review", "Mastered", "New"];
 
 const FlashcardsPage: React.FC = () => {
 	const [activeTab, setActiveTab] = useState("All Decks");
 	const [searchQuery, setSearchQuery] = useState("");
+	const [flashcardSets, setFlashcardSets] = useState<any[]>([]);
+	const [isLoading, setIsLoading] = useState(true);
+	const [isModalOpen, setIsModalOpen] = useState(false);
 
-	const filteredSets = mockFlashcardSets.filter((set) => {
+	const fetchFlashcards = async () => {
+		try {
+			setIsLoading(true);
+			const data = await flashcardService.getFlashcards();
+			
+			if (!data || !Array.isArray(data)) {
+				setFlashcardSets([]);
+				return;
+			}
+
+			const grouped: Record<string, any> = {};
+			data.forEach((card: any) => {
+				const docId = card.documentId || "standalone";
+				if (!grouped[docId]) {
+					grouped[docId] = {
+						id: docId,
+						title: card.document?.title || "Standalone Deck",
+						documentName: card.document?.title || "Manual added",
+						cardsCount: 0,
+						mastery: 0,
+						status: "learning",
+						dueForReview: 0,
+					};
+				}
+				grouped[docId].cardsCount++;
+				if (card.nextReview && new Date(card.nextReview) < new Date()) {
+					grouped[docId].dueForReview++;
+				}
+			});
+			setFlashcardSets(Object.values(grouped));
+		} catch (error) {
+			console.error("Failed to fetch flashcards:", error);
+		} finally {
+			setIsLoading(false);
+		}
+	};
+
+	useEffect(() => {
+		fetchFlashcards();
+	}, []);
+
+	const filteredSets = flashcardSets.filter((set) => {
 		const matchesTab =
 			activeTab === "All Decks" ||
 			(activeTab === "Due for Review" && set.dueForReview > 0) ||
@@ -94,7 +77,7 @@ const FlashcardsPage: React.FC = () => {
 			<div className='absolute bottom-0 left-0 w-[500px] h-[500px] bg-brand-violet/5 rounded-full blur-[150px] pointer-events-none' />
 
 			{/* Refined Header area */}
-			<div className='px-8 pt-10 pb-6 border-b border-border/50 bg-background/50 backdrop-blur-md sticky top-0 z-10'>
+			<div className='px-4 md:px-8 pt-8 md:pt-10 pb-6 border-b border-border/50 bg-background/50 backdrop-blur-md sticky top-0 z-10'>
 				<div className='flex flex-col md:flex-row md:items-end justify-between gap-6'>
 					<div className='relative z-10'>
 						<motion.div
@@ -109,7 +92,7 @@ const FlashcardsPage: React.FC = () => {
 							initial={{ opacity: 0, y: 10 }}
 							animate={{ opacity: 1, y: 0 }}
 							transition={{ delay: 0.1 }}
-							className='text-3xl md:text-5xl font-black text-foreground font-serif tracking-tight mb-3 flex items-center gap-3 drop-shadow-lg'
+							className='text-4xl md:text-5xl text-foreground font-serif tracking-tight mb-3 flex items-center gap-3 drop-shadow-lg'
 						>
 							Flashcards
 						</motion.h1>
@@ -149,18 +132,26 @@ const FlashcardsPage: React.FC = () => {
 			</div>
 
 			{/* Filter Tabs */}
-			<div className='px-8 py-5 border-b border-border/50 bg-background/30 backdrop-blur-sm sticky top-[180px] md:top-[160px] z-10'>
+			<div className='px-4 md:px-8 py-4 md:py-5 border-b border-border/50 bg-background/30 backdrop-blur-sm sticky top-[180px] md:top-[160px] z-10'>
 				<div className='flex items-center gap-2 overflow-x-auto pb-2 -mb-2 custom-scrollbar hide-scroll-indicator'>
 					{Tabs.map((tab) => (
 						<button
 							key={tab}
 							onClick={() => setActiveTab(tab)}
-							className={`px-5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all duration-300 ${
+							className={`relative px-5 py-2.5 rounded-xl text-xs font-bold whitespace-nowrap transition-colors duration-300 z-10 ${
 								activeTab === tab
-									? "bg-brand-orange text-white shadow-[0_4px_15px_-3px_rgba(255,111,32,0.4)] scale-105"
-									: "bg-card border border-border text-muted-foreground hover:text-foreground hover:bg-muted"
+									? "text-brand-orange"
+									: "text-muted-foreground hover:text-foreground"
 							}`}
 						>
+							{activeTab === tab && (
+								<motion.div
+									layoutId="activeFilterTabFlashcards"
+									className="absolute inset-0 bg-brand-orange/10 border border-brand-orange/20 rounded-xl flex shadow-soft -z-10"
+									initial={false}
+									transition={{ type: "spring", stiffness: 300, damping: 30 }}
+								/>
+							)}
 							{tab}
 						</button>
 					))}
@@ -168,9 +159,13 @@ const FlashcardsPage: React.FC = () => {
 			</div>
 
 			{/* Dynamic Grid */}
-			<div className='flex-1 overflow-y-auto custom-scrollbar p-8'>
+			<div className='flex-1 overflow-y-auto custom-scrollbar p-4 md:p-8'>
 				<AnimatePresence mode='wait'>
-					{filteredSets.length > 0 ? (
+					{isLoading ? (
+						<div className='flex items-center justify-center py-24'>
+							<p className='text-muted-foreground font-black uppercase tracking-widest text-xs animate-pulse'>Loading Flashcards...</p>
+						</div>
+					) : filteredSets.length > 0 ? (
 						<motion.div
 							key='grid'
 							initial={{ opacity: 0 }}
@@ -207,13 +202,25 @@ const FlashcardsPage: React.FC = () => {
 								We couldn't find any flashcards matching your
 								current filters.
 							</p>
-							<button className='px-6 py-3 bg-brand-orange text-white font-black text-xs uppercase tracking-widest rounded-xl hover:bg-brand-orange/90 transition-all shadow-[0_0_20px_rgba(255,111,32,0.3)]'>
+							<button 
+								onClick={() => setIsModalOpen(true)}
+								className='px-6 py-3 bg-brand-orange text-white font-black text-xs uppercase tracking-widest rounded-xl hover:bg-brand-orange/90 transition-all shadow-[0_0_20px_rgba(255,111,32,0.3)]'
+							>
 								Create a new Deck
 							</button>
 						</motion.div>
 					)}
 				</AnimatePresence>
 			</div>
+
+			<GenerationModal 
+				isOpen={isModalOpen} 
+				onClose={() => {
+					setIsModalOpen(false);
+					fetchFlashcards();
+				}} 
+				initialType='flashcard'
+			/>
 		</div>
 	);
 };

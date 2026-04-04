@@ -1,5 +1,5 @@
 import express from "express";
-import dotenv from "dotenv";
+import { env } from "./config/env";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import helmet from "helmet";
@@ -12,8 +12,12 @@ import testRouter from "./routes/test.routes";
 import flashcardRouter from "./routes/flashcard.routes";
 import { errorHandler } from "./middlewares/error.middleware";
 
+// Node.js worker disabled - background processing moved to /apps/processor (Python)
+// import "./workers/document.worker";
 
-dotenv.config();
+
+// Environment handled by config/env.ts
+// dotenv.config();
 
 const app = express();
 
@@ -30,11 +34,20 @@ app.use(
 
 app.use(
   cors({
-    origin: process.env.FRONTEND_URL || "http://localhost:5173",
+    origin: env.FRONTEND_URL,
     methods: ["POST", "GET", "PUT", "DELETE"],
     credentials: true,
   })
 );
+
+// Health Check
+app.get("/health", (req, res) => {
+  res.json({ 
+    status: "ok", 
+    timestamp: new Date().toISOString(),
+    environment: env.NODE_ENV
+  });
+});
 
 
 app.use(express.json());
@@ -49,8 +62,8 @@ app.use("/api/flashcards", flashcardRouter);
 // Error Handler
 app.use(errorHandler);
 
-const PORT = process.env.PORT || 3000;
+const PORT = env.PORT;
 
 app.listen(PORT, () => {
-  console.log(`app is running on port, ${PORT}...`);
+  console.log(`🚀 DUPI API is running on port ${PORT} [${env.NODE_ENV}]`);
 });

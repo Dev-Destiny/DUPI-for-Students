@@ -105,9 +105,9 @@ DUPI is an AI-powered educational platform designed to centralize and optimize t
 - HTTPS only (enforce SSL/TLS)
 - Document encryption at rest (AES-256)
 - Rate limiting on API endpoints (100 req/min per user)
-- Input sanitization and XSS protection
-- CORS configuration for frontend-backend communication
-- SQL injection prevention (parameterized queries)
+- Input validation using Zod on all API endpoints
+- Pydantic validation for asynchronous job payloads
+- SQL injection prevention (parameterized queries via Prisma)
 
 **Scalability:**
 
@@ -164,19 +164,18 @@ DUPI is an AI-powered educational platform designed to centralize and optimize t
 - **Feature-Based Structure**: The application's frontend relies on a `modules/` architectural pattern rather than a flat `pages/` directory. Core flows (e.g., `auth`, `onboarding`, `home`) act as isolated domains.
 - **Separation of Concerns**: Within each module, logic is separated into `pages/` (high-level routing logic), `views/` (individual screen segments), `layouts/` (structural wrappers), and `components/` (reusable UI).
 
-### Backend
+### Backend & Microservices
 
-| Component           | Technology             | Justification                                            |
-| ------------------- | ---------------------- | -------------------------------------------------------- |
-| Runtime             | Node.js 20+ (Express)  | JavaScript full-stack consistency, async I/O performance |
-| API Framework       | Express.js             | Minimal, flexible, extensive middleware ecosystem        |
-| Vector Database     | ChromaDB               | Open-source, Python/JS support, optimized for embeddings |
-| Relational Database | PostgreSQL 15+         | ACID compliance, robust querying, pgvector extension     |
-| ORM                 | Prisma                 | Type-safe database client, migration management          |
-| Authentication      | JWT + bcrypt           | Stateless auth, industry standard                        |
-| File Storage        | Supabase Storage       | Scalable object storage for user documents               |
-| Validation          | Zod                    | Shared validation schemas with frontend                  |
-| Task Queue          | Bull (Redis-based)     | Background job processing for document parsing           |
+| Component           | Technology               | Justification                                               |
+| ------------------- | ------------------------ | ----------------------------------------------------------- |
+| API Gateway (Node) | Express.js              | Fast, lightweight handling of user requests                 |
+| API Validation     | Zod                     | Schema-based request validation and type inference          |
+| **AI Processor**    | **Python 3.13 (FastAPI)**| **Superior AI ecosystem, better PDF/AI libraries (LangChain)**|
+| Processor Validation| Pydantic                | Robust data validation and type hinting for AI jobs         |
+| Vector Database     | ChromaDB                 | Optimized for high-performance embedding storage            |
+| Relational Database | PostgreSQL 15+ (Prisma)  | Shared source of truth for both Node.js and Python services |
+| Task Queue          | Redis Job List (LPUSH/BRPOP)| Durable asynchronous communication between services         |
+| File Storage        | Supabase Storage         | Central file repository for document processing             |
 
 ### AI/ML Infrastructure
 
@@ -184,7 +183,8 @@ DUPI is an AI-powered educational platform designed to centralize and optimize t
 | ----------------- | ----------------------------------- | ------------------------------------------------------- |
 | LLM Provider      | Anthropic Claude API / OpenAI GPT-4 | High-quality reasoning, large context window            |
 | Embedding Model   | OpenAI text-embedding-3-small       | Cost-effective, strong retrieval performance            |
-| RAG Framework     | LangChain.js                        | Abstraction for LLM orchestration, modular architecture |
+| RAG Framework     | LangChain (Python)                  | Industry standard for production AI pipelines           |
+| PDF Processing    | PyPDF2 / pdfplumber                 | More robust extraction than JS alternatives             |
 | Prompt Management | Custom prompt templates             | Version control for prompts, A/B testing capability     |
 
 ### DevOps & Infrastructure
@@ -196,7 +196,7 @@ DUPI is an AI-powered educational platform designed to centralize and optimize t
 | CI/CD              | GitHub Actions                         | Native integration, free tier for private repos          |
 | Hosting (Frontend) | Vercel / Netlify                       | Serverless, global CDN, preview deployments              |
 | Hosting (Backend)  | Railway / Render / Fly.io              | Managed Node.js hosting, database integration            |
-| Caching            | Redis                                  | Session storage, API response caching                    |
+| Caching & Queues   | Upstash Redis                          | Fully managed serverless Redis for BullMQ task backend   |
 | Monitoring         | Sentry (errors), Plausible (analytics) | Privacy-focused, actionable insights                     |
 | Logging            | Winston + CloudWatch                   | Structured logging, centralized log management           |
 | Testing            | Vitest (unit), Playwright (E2E)        | Fast, modern testing frameworks                          |
@@ -1157,8 +1157,8 @@ VITE_ENABLE_ANALYTICS=false
 # Database
 DATABASE_URL=postgresql://user:password@localhost:5432/dupi
 
-# Redis
-REDIS_URL=redis://localhost:6379
+# Upstash Redis
+REDIS_URL=redis://default:password@upstash.io:32451
 
 # Authentication
 JWT_SECRET=your-secret-key
@@ -1255,6 +1255,7 @@ dupi/
 | ------- | ----------- | ------------------------------------------------------------------------------ | ------------- |
 | 1.0     | Feb 8, 2026 | Initial PRD creation                                                           | Adesina Destiny |
 | 1.1     | Mar 8, 2026 | Added Midnight Academic Theme, Framer Motion mandate, and Modular Architecture | Antigravity   |
+| 1.2     | Mar 15, 2026| Updated backend task queue architecture to utilize Upstash Redis for BullMQ    | Antigravity   |
 
 ---
 

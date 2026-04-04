@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@dupi/ui";
+import { documentService } from "@/services/document.service";
 
 const quickActions = [
 	{
@@ -45,33 +46,42 @@ const quickActions = [
 	},
 ];
 
-const recentNotes = [
-	{
-		id: "1",
-		title: "Introduction to Node.js and Express",
-		lastOpened: "Last opened less than a minute ago",
-		type: "DOC",
-		color: "bg-blue-500",
-	},
-	{
-		id: "2",
-		title: "Cellular Respiration Biology Ch 12",
-		lastOpened: "Last opened 2 hours ago",
-		type: "PDF",
-		color: "bg-red-500",
-	},
-	{
-		id: "3",
-		title: "World War II History Notes",
-		lastOpened: "Last opened yesterday",
-		type: "TXT",
-		color: "bg-emerald-500",
-	},
-];
-
 const DashboardPage: React.FC = () => {
 	const navigate = useNavigate();
 	const [isSearchOpen, setIsSearchOpen] = useState(false);
+	const [recentNotes, setRecentNotes] = useState<any[]>([]);
+	const [isLoading, setIsLoading] = useState(true);
+
+	const fetchRecentNotes = async () => {
+		try {
+			setIsLoading(true);
+			const docs = await documentService.getDocuments();
+			// Take last 3 and format for the UI
+			const formatted = docs.slice(0, 3).map((doc: any) => {
+				const ext = (doc.title.split('.').pop() || "doc").toUpperCase();
+				let color = "bg-blue-500";
+				if (ext === "PDF") color = "bg-red-500";
+				if (ext === "TXT") color = "bg-emerald-500";
+				
+				return {
+					id: doc.id,
+					title: doc.title,
+					lastOpened: `Added on ${new Date(doc.createdAt).toLocaleDateString()}`,
+					type: ext,
+					color: color,
+				};
+			});
+			setRecentNotes(formatted);
+		} catch (error) {
+			console.error("Failed to fetch recent notes:", error);
+		} finally {
+			setIsLoading(false);
+		}
+	};
+
+	useEffect(() => {
+		fetchRecentNotes();
+	}, []);
 
 	const openSearch = useCallback(() => {
 		setIsSearchOpen(true);
@@ -97,14 +107,14 @@ const DashboardPage: React.FC = () => {
 	}, []);
 
 	return (
-		<div className='flex-1 flex flex-col bg-background p-8 overflow-y-auto custom-scrollbar relative'>
+		<div className='flex-1 flex flex-col bg-background p-4 md:p-8 overflow-y-auto custom-scrollbar relative'>
 			{/* Header */}
 			<div className='flex flex-col md:flex-row md:items-center justify-between gap-4 mb-10'>
 				<div>
 					<motion.h1
 						initial={{ opacity: 0, y: -10 }}
 						animate={{ opacity: 1, y: 0 }}
-						className='text-3xl md:text-4xl font-black text-foreground font-serif tracking-tight mb-2'
+						className='text-4xl md:text-5xl text-foreground font-serif tracking-tight mb-2' 
 					>
 						Dashboard
 					</motion.h1>
@@ -202,42 +212,53 @@ const DashboardPage: React.FC = () => {
 						Recent
 					</h3>
 					<div className='space-y-2'>
-						{recentNotes.map((note, i) => (
-							<motion.div
-								key={note.id}
-								initial={{ opacity: 0, x: -10 }}
-								animate={{ opacity: 1, x: 0 }}
-								transition={{ delay: 0.2 + i * 0.05 }}
-								whileHover={{ scale: 1.005, x: 4 }}
-								className='flex items-center gap-4 p-4 bg-card border border-border rounded-2xl hover:border-brand-orange/30 hover:shadow-md transition-all group cursor-pointer'
-							>
-								<div
-									className={`w-10 h-12 rounded-lg flex flex-col items-center justify-center shrink-0 shadow-sm ${note.color} bg-opacity-10 border border-current`}
+						{isLoading ? (
+							<div className='py-8 text-center'>
+								<p className='text-xs font-bold text-muted-foreground animate-pulse uppercase tracking-widest'>Loading your notes...</p>
+							</div>
+						) : recentNotes.length > 0 ? (
+							recentNotes.map((note, i) => (
+								<motion.div
+									key={note.id}
+									initial={{ opacity: 0, x: -10 }}
+									animate={{ opacity: 1, x: 0 }}
+									transition={{ delay: 0.2 + i * 0.05 }}
+									whileHover={{ scale: 1.005, x: 4 }}
+									onClick={() => navigate(`/documents/${note.id}`)}
+									className='flex items-center gap-4 p-4 bg-card border border-border rounded-2xl hover:border-brand-orange/30 hover:shadow-md transition-all group cursor-pointer'
 								>
-									<span
-										className={`text-[8px] font-black uppercase tracking-wider ${note.color.replace("bg-", "text-")}`}
+									<div
+										className={`w-10 h-12 rounded-lg flex flex-col items-center justify-center shrink-0 shadow-sm ${note.color} bg-opacity-10 border border-current`}
 									>
-										{note.type}
-									</span>
-									<FileText
-										className={`size-4 mt-0.5 ${note.color.replace("bg-", "text-")}`}
-									/>
-								</div>
+										<span
+											className={`text-[8px] font-black uppercase tracking-wider ${note.color.replace("bg-", "text-")}`}
+										>
+											{note.type}
+										</span>
+										<FileText
+											className={`size-4 mt-0.5 ${note.color.replace("bg-", "text-")}`}
+										/>
+									</div>
 
-								<div className='flex-1 min-w-0'>
-									<h4 className='font-bold text-foreground text-sm truncate group-hover:text-brand-orange transition-colors duration-300'>
-										{note.title}
-									</h4>
-									<p className='text-[11px] text-muted-foreground mt-1'>
-										{note.lastOpened}
-									</p>
-								</div>
+									<div className='flex-1 min-w-0'>
+										<h4 className='font-bold text-foreground text-sm truncate group-hover:text-brand-orange transition-colors duration-300'>
+											{note.title}
+										</h4>
+										<p className='text-[11px] text-muted-foreground mt-1'>
+											{note.lastOpened}
+										</p>
+									</div>
 
-								<button className='p-2 text-muted-foreground/50 hover:text-foreground hover:bg-muted rounded-lg opacity-0 group-hover:opacity-100 transition-all'>
-									<MoreVertical className='size-4' />
-								</button>
-							</motion.div>
-						))}
+									<button className='p-2 text-muted-foreground/50 hover:text-foreground hover:bg-muted rounded-lg opacity-0 group-hover:opacity-100 transition-all'>
+										<MoreVertical className='size-4' />
+									</button>
+								</motion.div>
+							))
+						) : (
+							<div className='py-8 text-center bg-card/30 border border-dashed border-border rounded-2xl'>
+								<p className='text-xs font-bold text-muted-foreground uppercase tracking-widest'>No recent notes found</p>
+							</div>
+						)}
 					</div>
 				</div>
 			</div>

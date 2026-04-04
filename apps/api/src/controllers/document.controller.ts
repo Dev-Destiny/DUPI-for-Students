@@ -4,21 +4,20 @@ import * as documentService from "../services/document.service";
 
 export const upload: RequestHandler = async (req, res, next) => {
 	try {
+		// console.log(req.user)
 		if (!req.file) {
 			throw new ApiError(400, "VALIDATION_ERROR", "No file uploaded.");
 		}
 
-		const userId = (req.user as any)?.userId;
+		const userId = req.user?.userId;
 		if (!userId) {
 			throw new ApiError(401, "AUTH_REQUIRED", "User not authenticated.");
 		}
 
 		const newDocument = await documentService.uploadAndCreateDocument(req.file, userId);
 
-		// TODO: Phase 2 - Add background job here for text extraction
-
 		res.status(201).json({
-			message: "Document uploaded successfully",
+			message: "Document uploaded. AI processing has started in the background.",
 			document: newDocument,
 		});
 	} catch (error) {
@@ -28,7 +27,7 @@ export const upload: RequestHandler = async (req, res, next) => {
 
 export const list: RequestHandler = async (req, res, next) => {
 	try {
-		const userId = (req.user as any)?.userId;
+		const userId = req.user?.userId;
 		if (!userId) {
 			throw new ApiError(401, "AUTH_REQUIRED", "User not authenticated.");
 		}
@@ -42,7 +41,7 @@ export const list: RequestHandler = async (req, res, next) => {
 
 export const get: RequestHandler = async (req, res, next) => {
 	try {
-		const userId = (req.user as any)?.userId;
+		const userId = req.user?.userId;
 		const id = req.params.id as string;
 		if (!userId) {
 			throw new ApiError(401, "AUTH_REQUIRED", "USER_NOT_AUTHENTICATED");
@@ -57,7 +56,7 @@ export const get: RequestHandler = async (req, res, next) => {
 
 export const remove: RequestHandler = async (req, res, next) => {
 	try {
-		const userId = (req.user as any)?.userId;
+		const userId = req.user?.userId;
 		const id = req.params.id as string;
 		if (!userId) {
 			throw new ApiError(401, "AUTH_REQUIRED", "USER_NOT_AUTHENTICATED");

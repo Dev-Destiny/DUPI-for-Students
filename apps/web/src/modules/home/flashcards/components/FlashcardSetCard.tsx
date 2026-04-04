@@ -18,6 +18,8 @@ import {
 	DropdownMenuSeparator,
 } from "@dupi/ui";
 
+import { useNavigate } from "react-router-dom";
+
 interface FlashcardSet {
 	id: string;
 	title: string;
@@ -34,6 +36,11 @@ interface FlashcardSetCardProps {
 }
 
 export const FlashcardSetCard: React.FC<FlashcardSetCardProps> = ({ set }) => {
+	const navigate = useNavigate();
+
+	const handleStudy = () => {
+		navigate(`/flashcards/${set.id}`);
+	};
 	const getMasteryColor = (mastery: number) => {
 		if (mastery >= 80) return "text-emerald-500 bg-emerald-500/10";
 		if (mastery >= 40) return "text-brand-orange bg-brand-orange/10";
@@ -56,8 +63,9 @@ export const FlashcardSetCard: React.FC<FlashcardSetCardProps> = ({ set }) => {
 			whileHover={{ y: -4 }}
 			transition={{ type: "spring", stiffness: 300, damping: 25 }}
 			className='h-full'
+			onClick={handleStudy}
 		>
-			<Card className='group relative overflow-hidden h-full border-border bg-card shadow-lg shadow-black/5 hover:border-brand-orange/40 transition-all duration-300 flex flex-col'>
+			<Card className='group relative cursor-pointer overflow-hidden h-full border-border bg-card shadow-lg shadow-black/5 hover:border-brand-orange/40 transition-all duration-300 flex flex-col'>
 				<div className='p-5 flex-1 flex flex-col'>
 					{/* Header Actions */}
 					<div className='flex items-start justify-between mb-4'>

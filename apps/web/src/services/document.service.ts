@@ -14,12 +14,20 @@ export const documentService = {
 		return response.data;
 	},
 
-	/**
+	/** 
 	 * Fetches all documents for the authenticated user.
 	 */
 	getDocuments: async () => {
 		const response = await api.get("/documents");
 		return response.data;
+	},
+
+	/** 
+	 * Fetches a single document by ID.
+	 */
+	getDocumentById: async (id: string) => {
+		const response = await api.get(`/documents/${id}`);
+		return response.data.document;
 	},
 
 	// We can add other document API calls here like delete, status, etc.

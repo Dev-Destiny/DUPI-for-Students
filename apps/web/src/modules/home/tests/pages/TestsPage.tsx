@@ -1,75 +1,56 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Input } from "@dupi/ui";
 import { Filter, Search, GraduationCap } from "lucide-react";
 import { TestCard } from "../components/TestCard";
-
-// Mock Data
-const mockTests = [
-	{
-		id: "1",
-		title: "Cellular Respiration Final Review",
-		documentName: "Biology Ch 12.pdf",
-		questionsCount: 20,
-		difficulty: "medium" as const,
-		status: "completed" as const,
-		score: 85,
-		lastAttempt: "2 hours ago",
-	},
-	{
-		id: "2",
-		title: "Node.js Fundamentals Quiz",
-		documentName: "Intro to Node.js and Express.docx",
-		questionsCount: 15,
-		difficulty: "easy" as const,
-		status: "in-progress" as const,
-		lastAttempt: "Yesterday",
-	},
-	{
-		id: "3",
-		title: "Advanced React Context API",
-		documentName: "React Advanced Patterns.txt",
-		questionsCount: 10,
-		difficulty: "hard" as const,
-		status: "new" as const,
-	},
-	{
-		id: "4",
-		title: "SQL Joins Practice Test",
-		documentName: "Database Schema Overview.pdf",
-		questionsCount: 25,
-		difficulty: "medium" as const,
-		status: "new" as const,
-	},
-	{
-		id: "5",
-		title: "World War 2 History Dates",
-		documentName: "WW2 History.pdf",
-		questionsCount: 30,
-		difficulty: "hard" as const,
-		status: "completed" as const,
-		score: 62,
-		lastAttempt: "3 days ago",
-	},
-	{
-		id: "6",
-		title: "Basic Mathematics Algebra",
-		documentName: "Algebra 101.pdf",
-		questionsCount: 10,
-		difficulty: "easy" as const,
-		status: "completed" as const,
-		score: 100,
-		lastAttempt: "Last week",
-	},
-];
+import { testService } from "@/services/test.service";
+import { GenerationModal } from "@/components/modals/GenerationModal";
 
 const Tabs = ["All Tests", "Completed", "In Progress", "Not Started"];
 
 const TestsPage: React.FC = () => {
 	const [activeTab, setActiveTab] = useState("All Tests");
 	const [searchQuery, setSearchQuery] = useState("");
+	const [tests, setTests] = useState<any[]>([]);
+	const [isLoading, setIsLoading] = useState(true);
+	const [isModalOpen, setIsModalOpen] = useState(false);
 
-	const filteredTests = mockTests.filter((test) => {
+	const fetchTests = async () => {
+		try {
+			setIsLoading(true);
+			const data = await testService.getTests();
+			
+			if (!data || !Array.isArray(data)) {
+				setTests([]);
+				return;
+			}
+
+			const formatted = data.map((test: any) => ({
+				id: test.id,
+				title: test.title || test.topic || "Untitled Test",
+				documentName: test.document?.title || "Manual Topic",
+				questionsCount: test.questionsCount || 0,
+				difficulty: test.difficulty || "medium",
+				status: (test.attempts && test.attempts.length > 0) ? "completed" : "new",
+				score: test.attempts?.[0]?.score,
+				lastAttempt: test.attempts?.[0] 
+					? new Date(test.attempts[0].createdAt).toLocaleDateString()
+					: null,
+			}));
+			setTests(formatted);
+			console.log("setted")
+		} catch (error) {
+			console.error("Failed to fetch tests:", error);
+		} finally {
+			setIsLoading(false);
+		}
+	};
+
+	useEffect(() => {
+		fetchTests();
+	}, []);
+
+	const filteredTests = tests.filter((test) => {
 		const matchesTab =
 			activeTab === "All Tests" ||
 			(activeTab === "Completed" && test.status === "completed") ||
@@ -90,7 +71,7 @@ const TestsPage: React.FC = () => {
 			<div className='absolute bottom-0 left-0 w-[500px] h-[500px] bg-brand-violet/5 rounded-full blur-[150px] pointer-events-none' />
 
 			{/* Refined Header area */}
-			<div className='px-8 pt-10 pb-6 border-b border-border/50 bg-background/50 backdrop-blur-md sticky top-0 z-10'>
+			<div className='px-4 md:px-8 pt-8 md:pt-10 pb-6 border-b border-border/50 bg-background/50 backdrop-blur-md sticky top-0 z-10'>
 				<div className='flex flex-col md:flex-row md:items-end justify-between gap-6'>
 					<div className='relative z-10'>
 						<motion.div
@@ -105,7 +86,7 @@ const TestsPage: React.FC = () => {
 							initial={{ opacity: 0, y: 10 }}
 							animate={{ opacity: 1, y: 0 }}
 							transition={{ delay: 0.1 }}
-							className='text-3xl md:text-5xl font-black text-foreground font-serif tracking-tight mb-3 flex items-center gap-3 drop-shadow-lg'
+							className='text-4xl md:text-5xl text-foreground font-serif tracking-tight mb-3 flex items-center gap-3 drop-shadow-lg'
 						>
 							My Tests
 						</motion.h1>
@@ -145,18 +126,26 @@ const TestsPage: React.FC = () => {
 			</div>
 
 			{/* Filter Tabs */}
-			<div className='px-8 py-5 border-b border-border/50 bg-background/30 backdrop-blur-sm sticky top-[180px] md:top-[160px] z-10'>
+			<div className='px-4 md:px-8 py-4 md:py-5 border-b border-border/50 bg-background/30 backdrop-blur-sm sticky top-[180px] md:top-[160px] z-10'>
 				<div className='flex items-center gap-2 overflow-x-auto pb-2 -mb-2 custom-scrollbar hide-scroll-indicator'>
 					{Tabs.map((tab) => (
 						<button
 							key={tab}
 							onClick={() => setActiveTab(tab)}
-							className={`px-5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all duration-300 ${
+							className={`relative px-5 py-2.5 rounded-xl text-xs font-bold whitespace-nowrap transition-colors duration-300 z-10 ${
 								activeTab === tab
-									? "bg-brand-orange text-white shadow-[0_4px_15px_-3px_rgba(255,111,32,0.4)] scale-105"
-									: "bg-card border border-border text-muted-foreground hover:text-foreground hover:bg-muted"
+									? "text-brand-orange"
+									: "text-muted-foreground hover:text-foreground"
 							}`}
 						>
+							{activeTab === tab && (
+								<motion.div
+									layoutId="activeFilterTabTests"
+									className="absolute inset-0 bg-brand-orange/10 border border-brand-orange/20 rounded-xl flex shadow-soft -z-10"
+									initial={false}
+									transition={{ type: "spring", stiffness: 300, damping: 30 }}
+								/>
+							)}
 							{tab}
 						</button>
 					))}
@@ -164,9 +153,13 @@ const TestsPage: React.FC = () => {
 			</div>
 
 			{/* Dynamic Grid */}
-			<div className='flex-1 overflow-y-auto custom-scrollbar p-8'>
+			<div className='flex-1 overflow-y-auto custom-scrollbar p-4 md:p-8'>
 				<AnimatePresence mode='wait'>
-					{filteredTests.length > 0 ? (
+					{isLoading ? (
+						<div className='flex items-center justify-center py-24'>
+							<p className='text-muted-foreground font-black uppercase tracking-widest text-xs animate-pulse'>Loading Tests...</p>
+						</div>
+					) : filteredTests.length > 0 ? (
 						<motion.div
 							key='grid'
 							initial={{ opacity: 0 }}
@@ -203,13 +196,25 @@ const TestsPage: React.FC = () => {
 								We couldn't find any tests matching your current
 								filters.
 							</p>
-							<button className='px-6 py-3 bg-brand-orange text-white font-black text-xs uppercase tracking-widest rounded-xl hover:bg-brand-orange/90 transition-all shadow-[0_0_20px_rgba(255,111,32,0.3)]'>
+							<button 
+								onClick={() => setIsModalOpen(true)}
+								className='px-6 py-3 bg-brand-orange text-white font-black text-xs uppercase tracking-widest rounded-xl hover:bg-brand-orange/90 transition-all shadow-[0_0_20px_rgba(255,111,32,0.3)]'
+							>
 								Generate a new Test
 							</button>
 						</motion.div>
 					)}
 				</AnimatePresence>
 			</div>
+
+			<GenerationModal 
+				isOpen={isModalOpen} 
+				onClose={() => {
+					setIsModalOpen(false);
+					fetchTests(); // Refresh list after generation
+				}} 
+				initialType='test'
+			/>
 		</div>
 	);
 };

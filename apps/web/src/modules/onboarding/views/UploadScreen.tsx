@@ -61,7 +61,7 @@ export const UploadScreen: FC<UploadScreenProps> = ({
 			initial='initial'
 			animate='animate'
 			exit='exit'
-			className='flex flex-col min-h-screen bg-background overflow-hidden relative'
+			className='flex flex-col min-h-screen w-full bg-background overflow-hidden relative'
 		>
 			<OnboardingHeader step={3} onSkip={onSkip} onBack={onBack} />
 

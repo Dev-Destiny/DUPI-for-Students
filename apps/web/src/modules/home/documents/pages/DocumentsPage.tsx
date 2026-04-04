@@ -74,11 +74,11 @@ const DocumentsPage: React.FC = () => {
 			{/* Main Content Area */}
 			<div className='flex-1 flex flex-col min-w-0'>
 				<ScrollArea className='flex-1'>
-					<div className='p-8 max-w-6xl mx-auto space-y-8'>
+					<div className='px-4 py-6 md:p-8 max-w-6xl mx-auto space-y-6 md:space-y-8'>
 						{/* Header Section */}
 						<div className='flex flex-col md:flex-row md:items-center justify-between gap-4'>
 							<div>
-								<h1 className='text-4xl font-black text-foreground tracking-tight font-serif'>
+								<h1 className='text-4xl md:text-5xl text-foreground tracking-tight font-serif'>
 									Document{" "}
 									<span className='text-brand-orange'>
 										Library.
