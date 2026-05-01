@@ -5,8 +5,10 @@ import {
   type User, 
   type LoginInput, 
   type SignupInput, 
-  type AuthResponse 
-} from "@dupi/shared";
+  type AuthResponse,
+  type UserNotifications,
+  type UserPreferences
+} from "@studify/shared";
 
 interface AuthState {
   user: User | null;
@@ -17,9 +19,12 @@ interface AuthState {
 
   login: (data: LoginInput) => Promise<void>;
   signup: (data: SignupInput) => Promise<void>;
+  loginWithGoogle: (idToken: string) => Promise<void>;
   logout: () => Promise<void>;
   checkAuth: () => Promise<void>;
   updateProfile: (data: Partial<User>) => Promise<void>;
+  updateSettings: (data: { preferences?: UserPreferences; notifications?: UserNotifications }) => Promise<void>;
+  changePassword: (data: any) => Promise<void>;
   setAccessToken: (token: string) => void;
   clearError: () => void;
 }
@@ -72,6 +77,25 @@ export const useAuthStore = create<AuthState>()(
         }
       },
 
+      loginWithGoogle: async (code: string) => {
+        set({ isLoading: true, error: null });
+        try {
+          const response = await api.post<AuthResponse>("/auth/google", { code });
+          set({ 
+            user: response.data.user, 
+            accessToken: response.data.accessToken,
+            isAuthenticated: true, 
+            isLoading: false 
+          });
+        } catch (error: any) {
+          set({ 
+            isLoading: false, 
+            error: error.response?.data?.message || "Google login failed" 
+          });
+          throw error;
+        }
+      },
+
       logout: async () => {
         try {
           await api.post("/auth/logout");
@@ -118,12 +142,40 @@ export const useAuthStore = create<AuthState>()(
         }
       },
 
+      updateSettings: async (data: { preferences?: UserPreferences; notifications?: UserNotifications }) => {
+        set({ isLoading: true, error: null });
+        try {
+          const response = await api.put<User>("/auth/update-settings", data);
+          set({ user: response.data, isLoading: false });
+        } catch (error: any) {
+          set({ 
+            isLoading: false, 
+            error: error.response?.data?.message || "Settings update failed" 
+          });
+          throw error;
+        }
+      },
+
+      changePassword: async (data: any) => {
+        set({ isLoading: true, error: null });
+        try {
+          await api.post("/auth/change-password", data);
+          set({ isLoading: false });
+        } catch (error: any) {
+          set({ 
+            isLoading: false, 
+            error: error.response?.data?.message || "Password change failed" 
+          });
+          throw error;
+        }
+      },
+
       setAccessToken: (token: string) => set({ accessToken: token }),
 
       clearError: () => set({ error: null }),
     }),
     {
-      name: "dupi-auth",
+      name: "studify-auth",
       partialize: (state) => ({ 
         user: state.user, 
         isAuthenticated: state.isAuthenticated,

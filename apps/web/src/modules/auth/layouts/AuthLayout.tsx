@@ -1,6 +1,5 @@
 import { type FC, type ReactNode } from "react";
 import { motion } from "framer-motion";
-import { Link } from "react-router-dom";
 
 interface AuthLayoutProps {
 	children: ReactNode;
@@ -8,99 +7,49 @@ interface AuthLayoutProps {
 
 const AuthLayout: FC<AuthLayoutProps> = ({ children }) => {
 	return (
-		<div className='min-h-screen w-full flex flex-col justify-center items-center bg-background auth-bg-pattern px-6 py-12 relative overflow-hidden'>
-			{/* Decorative background elements - purely visual now */}
-			<motion.div
-				className='absolute top-[-10%] left-[-5%] w-[50%] h-[50%] bg-brand-orange/5 rounded-full blur-[120px] will-change-transform'
-				animate={{
-					scale: [1, 1.1, 1],
-					opacity: [0.2, 0.4, 0.2],
-				}}
-				transition={{
-					duration: 15,
-					repeat: Infinity,
-					ease: "easeInOut",
-				}}
-			/>
-			<motion.div
-				className='absolute bottom-[-10%] right-[-5%] w-[50%] h-[50%] bg-brand-violet/5 rounded-full blur-[120px] will-change-transform'
-				animate={{
-					scale: [1.1, 1, 1.1],
-					opacity: [0.2, 0.3, 0.2],
-				}}
-				transition={{
-					duration: 18,
-					repeat: Infinity,
-					ease: "easeInOut",
-				}}
-			/>
-
-			{/* Main Logo - Simple & Elegant */}
-			<motion.div
-				initial={{ opacity: 0, y: -20, scale: 0.9 }}
-				animate={{ opacity: 1, y: 0, scale: 1 }}
-				transition={{
-					type: "spring",
-					stiffness: 400,
-					damping: 25,
-					delay: 0.1,
-				}}
-				className='mb-10'
-			>
-				<Link to='/' className='flex items-center gap-3 group'>
-					<span className='font-grotesk font-bold tracking-tighter text-foreground text-4xl flex items-center gap-[4px]'>
-						dupi
-						<span className='w-3 h-3 rounded-full bg-brand-orange shadow-[0_0_15px_rgba(255,111,32,0.5)]'></span>
-					</span>
-				</Link>
-			</motion.div>
-
-			{/* Form Container */}
-			<motion.div
-				className='w-full max-w-md relative z-10'
-				initial={{ opacity: 0, scale: 0.95 }}
-				animate={{ opacity: 1, scale: 1 }}
-				transition={{
-					type: "spring",
-					stiffness: 300,
-					damping: 25,
-					delay: 0.2,
-				}}
-			>
-				<div className='bg-card/80 backdrop-blur-xl border border-border/50 shadow-2xl shadow-black/40 rounded-[2.5rem] p-8 md:p-10'>
+		<div className='min-h-screen w-full grid grid-cols-1 lg:grid-cols-2 bg-background'>
+			{/* Form Side */}
+			<main className='flex items-center justify-center p-8 md:p-16 lg:p-24 relative overflow-hidden'>
+				<motion.div 
+					className='w-full max-w-md'
+					initial={{ opacity: 0, x: -20 }}
+					animate={{ opacity: 1, x: 0 }}
+					transition={{ duration: 0.6, ease: "easeOut" }}
+				>
 					{children}
-				</div>
-			</motion.div>
+				</motion.div>
+			</main>
 
-			{/* Simplified Footer */}
-			<motion.div
-				className='mt-12 text-center text-xs text-muted-foreground/60'
-				initial={{ opacity: 0 }}
-				animate={{ opacity: 1 }}
-				transition={{ delay: 0.8, duration: 1 }}
-			>
-				<p className='mb-4'>© 2026 DUPI AI Technologies</p>
-				<div className='flex justify-center gap-6'>
-					<Link
-						to='/help'
-						className='hover:text-brand-orange transition-colors duration-200'
-					>
-						Help
-					</Link>
-					<Link
-						to='/security'
-						className='hover:text-brand-orange transition-colors duration-200'
-					>
-						Security
-					</Link>
-					<Link
-						to='/contact'
-						className='hover:text-brand-orange transition-colors duration-200'
-					>
-						Contact
-					</Link>
+			{/* Quote Side */}
+			<aside className='hidden lg:flex flex-col items-center justify-center p-24 bg-card/30 border-l border-border/50 relative overflow-hidden'>
+				<div className='absolute inset-0 bg-muted/10 pointer-events-none' />
+				
+				<motion.div 
+					className='max-w-md text-center space-y-8 relative z-10'
+					initial={{ opacity: 0, scale: 0.95 }}
+					animate={{ opacity: 1, scale: 1 }}
+					transition={{ duration: 0.8, delay: 0.2 }}
+				>
+					<div className='w-12 h-0.5 bg-brand-orange mx-auto mb-10' />
+					<h2 className='text-3xl font-serif italic text-foreground leading-relaxed'>
+						"Education is the kindling of a flame, not the filling of a vessel."
+					</h2>
+					<div className='flex flex-col items-center gap-1'>
+						<span className='text-sm font-bold uppercase tracking-[0.2em] text-muted-foreground'>
+							Socrates
+						</span>
+						<span className='text-[10px] text-muted-foreground/40 font-medium tracking-widest'>
+							Ancient Greek Philosopher
+						</span>
+					</div>
+					<div className='w-12 h-0.5 bg-brand-orange mx-auto mt-10' />
+				</motion.div>
+
+				{/* Subtle texture or motif */}
+				<div className='absolute bottom-12 right-12 opacity-[0.03] select-none pointer-events-none'>
+					<span className='text-[180px] font-serif font-black'>&para;</span>
 				</div>
-			</motion.div>
+			</aside>
 		</div>
 	);
 };

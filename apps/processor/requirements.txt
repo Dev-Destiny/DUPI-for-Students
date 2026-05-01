@@ -20,3 +20,6 @@ pydantic-settings
 pydantic-extra-types
 google-generativeai
 langchain-google-genai
+langchain-groq
+langchain-huggingface
+sentence-transformers

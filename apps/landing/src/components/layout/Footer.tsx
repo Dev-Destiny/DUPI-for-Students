@@ -27,16 +27,16 @@ const Footer: FC = () => {
 					<div className='col-span-2'>
 						<div className='flex items-center gap-1 mb-6'>
 							<span className='font-grotesk font-bold tracking-tighter text-foreground text-2xl flex items-center gap-[3px]'>
-								dupi
+								studify
 								<img
-									src='/image/dupi-mark.svg'
-									alt='DUPI logo'
+									src='/image/studify-mark.svg'
+									alt='Studify logo'
 									className='h-5 w-5'
 								/>
 							</span>
 						</div>
 						<p className='text-muted-foreground max-w-xs mb-6 text-sm leading-relaxed'>
-							DUPI is building the future of personalized learning
+							Studify is building the future of personalized learning
 							through AI-driven assessment generation.
 						</p>
 						<div className='flex gap-4'>
@@ -120,7 +120,7 @@ const Footer: FC = () => {
 				{/* Bottom */}
 				<div className='pt-12 border-t border-border flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-muted-foreground'>
 					<p>
-						© {new Date().getFullYear()} DUPI AI. All rights
+						© {new Date().getFullYear()} Studify AI. All rights
 						reserved.
 					</p>
 					<div className='flex gap-6'>

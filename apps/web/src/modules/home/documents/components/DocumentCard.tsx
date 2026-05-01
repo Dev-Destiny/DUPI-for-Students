@@ -17,7 +17,8 @@ import {
 	DropdownMenuItem,
 	DropdownMenuTrigger,
 	DropdownMenuSeparator,
-} from "@dupi/ui";
+} from "@studify/ui";
+import { documentService } from "@/services/document.service";
 
 interface Document {
 	id: string;
@@ -32,10 +33,24 @@ interface Document {
 
 interface DocumentCardProps {
 	doc: Document;
+	onDelete: (id: string) => void
 }
 
-export const DocumentCard: React.FC<DocumentCardProps> = ({ doc }) => {
+export const DocumentCard: React.FC<DocumentCardProps> = ({ doc, onDelete }) => {
 	const navigate = useNavigate();
+	const handleDelete = async (e: React.MouseEvent) => {
+		e.stopPropagation(); // Prevent card click (navigation)
+
+		if (window.confirm("Are you sure you want to delete this document?")) {
+			try {
+				await documentService.deleteDocument(doc.id);
+				if (onDelete) onDelete(doc.id);
+			} catch (error) {
+				console.error("Failed to delete document:", error);
+				alert("Failed to delete document. Please try again.");
+			}
+		}
+	};
 
 	return (
 		<motion.div
@@ -84,7 +99,10 @@ export const DocumentCard: React.FC<DocumentCardProps> = ({ doc }) => {
 									Create Flashcards
 								</DropdownMenuItem>
 								<DropdownMenuSeparator />
-								<DropdownMenuItem className='gap-2 text-xs font-bold text-destructive focus:text-destructive focus:bg-destructive/10'>
+								<DropdownMenuItem
+									className='gap-2 text-xs font-bold text-destructive focus:text-destructive focus:bg-destructive/10'
+									onClick={handleDelete}
+								>
 									<Trash2 className='size-3.5' /> Delete
 									Document
 								</DropdownMenuItem>

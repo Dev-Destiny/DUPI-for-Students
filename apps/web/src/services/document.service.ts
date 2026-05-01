@@ -30,5 +30,19 @@ export const documentService = {
 		return response.data.document;
 	},
 
-	// We can add other document API calls here like delete, status, etc.
+	/**
+	 * Deletes a document by ID.
+	 */
+	deleteDocument: async (id: string) => {
+		const response = await api.delete(`/documents/${id}`);
+		return response.data;
+	},
+
+	/**
+	 * Regenerates a summary for an already processed document.
+	 */
+	regenerateSummary: async (id: string) => {
+		const response = await api.post(`/documents/${id}/regenerate-summary`);
+		return response.data;
+	},
 };

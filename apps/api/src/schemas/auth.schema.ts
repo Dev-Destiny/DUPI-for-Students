@@ -27,3 +27,9 @@ export const updateProfileSchema = z.object({
 export type RegisterUserPayload = z.infer<typeof registerSchema>["body"];
 export type LoginUserPayload = z.infer<typeof loginSchema>["body"];
 export type UpdateUserPayload = z.infer<typeof updateProfileSchema>["body"];
+
+export const googleLoginSchema = z.object({
+  body: z.object({
+    code: z.string().min(1, "Google authorization code is required"),
+  }),
+});

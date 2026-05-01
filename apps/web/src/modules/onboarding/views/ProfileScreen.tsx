@@ -4,7 +4,7 @@ import { Camera, ChevronDown } from "lucide-react";
 import { OnboardingHeader } from "./OnboardingHeader";
 import { slide, FIELDS } from "./constants";
 
-import { type User } from "@dupi/shared";
+import { type User } from "@studify/shared";
 
 interface ProfileScreenProps {
 	user: User | null;

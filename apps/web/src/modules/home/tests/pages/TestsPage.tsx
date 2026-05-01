@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Input } from "@dupi/ui";
-import { Filter, Search, GraduationCap } from "lucide-react";
+import { Input } from "@studify/ui";
+import { Filter, Search, GraduationCap, Plus } from "lucide-react";
 import { TestCard } from "../components/TestCard";
 import { testService } from "@/services/test.service";
 import { GenerationModal } from "@/components/modals/GenerationModal";
@@ -31,10 +31,10 @@ const TestsPage: React.FC = () => {
 				documentName: test.document?.title || "Manual Topic",
 				questionsCount: test.questionsCount || 0,
 				difficulty: test.difficulty || "medium",
-				status: (test.attempts && test.attempts.length > 0) ? "completed" : "new",
-				score: test.attempts?.[0]?.score,
-				lastAttempt: test.attempts?.[0] 
-					? new Date(test.attempts[0].createdAt).toLocaleDateString()
+				status: (test.testAttempts && test.testAttempts.length > 0) ? "completed" : "new",
+				score: test.testAttempts?.[0]?.score,
+				lastAttempt: test.testAttempts?.[0] 
+					? new Date(test.testAttempts[0].completedAt).toLocaleDateString()
 					: null,
 			}));
 			setTests(formatted);
@@ -72,7 +72,7 @@ const TestsPage: React.FC = () => {
 
 			{/* Refined Header area */}
 			<div className='px-4 md:px-8 pt-8 md:pt-10 pb-6 border-b border-border/50 bg-background/50 backdrop-blur-md sticky top-0 z-10'>
-				<div className='flex flex-col md:flex-row md:items-end justify-between gap-6'>
+				<div className='flex flex-col lg:flex-row lg:items-end justify-between gap-6'>
 					<div className='relative z-10'>
 						<motion.div
 							initial={{ opacity: 0, y: -10 }}
@@ -106,7 +106,7 @@ const TestsPage: React.FC = () => {
 						initial={{ opacity: 0, scale: 0.95 }}
 						animate={{ opacity: 1, scale: 1 }}
 						transition={{ delay: 0.15 }}
-						className='flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto relative z-10'
+						className='flex flex-col sm:flex-row lg:flex-row items-center gap-3 w-full lg:w-auto relative z-10'
 					>
 						<div className='relative w-full sm:w-64'>
 							<Search className='absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground' />
@@ -117,6 +117,13 @@ const TestsPage: React.FC = () => {
 								onChange={(e) => setSearchQuery(e.target.value)}
 							/>
 						</div>
+						<button 
+							onClick={() => setIsModalOpen(true)}
+							className='flex items-center justify-center gap-2 h-11 px-6 bg-brand-orange text-white rounded-xl hover:bg-brand-orange/90 transition-all font-bold text-xs uppercase tracking-widest shadow-[0_0_20px_rgba(255,111,32,0.3)] w-full sm:w-auto'
+						>
+							<Plus className='size-4' />
+							Generate New Test
+						</button>
 						<button className='flex items-center justify-center gap-2 h-11 px-4 bg-card/50 border border-border rounded-xl text-muted-foreground hover:text-brand-orange hover:bg-brand-orange/5 hover:border-brand-orange/30 transition-all font-bold text-xs uppercase tracking-wider shrink-0 w-full sm:w-auto shadow-sm'>
 							<Filter className='size-4' />
 							Filter
@@ -126,13 +133,13 @@ const TestsPage: React.FC = () => {
 			</div>
 
 			{/* Filter Tabs */}
-			<div className='px-4 md:px-8 py-4 md:py-5 border-b border-border/50 bg-background/30 backdrop-blur-sm sticky top-[180px] md:top-[160px] z-10'>
-				<div className='flex items-center gap-2 overflow-x-auto pb-2 -mb-2 custom-scrollbar hide-scroll-indicator'>
+			<div className='px-4 md:px-8 py-4 md:py-5 border-b border-border/50 bg-background/30 backdrop-blur-sm sticky top-[180px] lg:top-[160px] z-10'>
+				<div className='flex items-center gap-2 overflow-x-auto pb-2 -mb-2 custom-scrollbar hide-scroll-indicator snap-x snap-mandatory'>
 					{Tabs.map((tab) => (
 						<button
 							key={tab}
 							onClick={() => setActiveTab(tab)}
-							className={`relative px-5 py-2.5 rounded-xl text-xs font-bold whitespace-nowrap transition-colors duration-300 z-10 ${
+							className={`relative px-5 py-2.5 rounded-xl text-xs font-bold whitespace-nowrap transition-colors duration-300 z-10 snap-start ${
 								activeTab === tab
 									? "text-brand-orange"
 									: "text-muted-foreground hover:text-foreground"
@@ -174,7 +181,12 @@ const TestsPage: React.FC = () => {
 									animate={{ opacity: 1, y: 0 }}
 									transition={{ delay: i * 0.05 + 0.2 }}
 								>
-									<TestCard test={test} />
+									<TestCard 
+										test={test} 
+										onDelete={(id) => {
+											setTests(prev => prev.filter(t => t.id !== id));
+										}}
+									/>
 								</motion.div>
 							))}
 						</motion.div>

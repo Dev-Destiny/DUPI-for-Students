@@ -16,12 +16,15 @@ import {
 	DropdownMenuItem,
 	DropdownMenuTrigger,
 	DropdownMenuSeparator,
-} from "@dupi/ui";
+} from "@studify/ui";
 
 import { useNavigate } from "react-router-dom";
 
+import { flashcardService } from "@/services/flashcard.service";
+import { Trash2 } from "lucide-react";
+
 interface FlashcardSet {
-	id: string;
+	id: string; // documentId
 	title: string;
 	documentName: string;
 	cardsCount: number;
@@ -33,13 +36,27 @@ interface FlashcardSet {
 
 interface FlashcardSetCardProps {
 	set: FlashcardSet;
+	onDelete?: (id: string) => void;
 }
 
-export const FlashcardSetCard: React.FC<FlashcardSetCardProps> = ({ set }) => {
+export const FlashcardSetCard: React.FC<FlashcardSetCardProps> = ({ set, onDelete }) => {
 	const navigate = useNavigate();
 
 	const handleStudy = () => {
 		navigate(`/flashcards/${set.id}`);
+	};
+
+	const handleDelete = async (e: React.MouseEvent) => {
+		e.stopPropagation();
+		if (window.confirm("Are you sure you want to delete this entire flashcard set?")) {
+			try {
+				await flashcardService.deleteFlashcardSet(set.id);
+				if (onDelete) onDelete(set.id);
+			} catch (error) {
+				console.error("Failed to delete flashcard set:", error);
+				alert("Failed to delete flashcard set. Please try again.");
+			}
+		}
 	};
 	const getMasteryColor = (mastery: number) => {
 		if (mastery >= 80) return "text-emerald-500 bg-emerald-500/10";
@@ -101,8 +118,11 @@ export const FlashcardSetCard: React.FC<FlashcardSetCardProps> = ({ set }) => {
 									Share Deck
 								</DropdownMenuItem>
 								<DropdownMenuSeparator />
-								<DropdownMenuItem className='gap-2 text-xs font-bold text-destructive focus:text-destructive focus:bg-destructive/10'>
-									Delete Set
+								<DropdownMenuItem 
+									className='gap-2 text-xs font-bold text-destructive focus:text-destructive focus:bg-destructive/10'
+									onClick={handleDelete}
+								>
+									<Trash2 className="size-3.5" /> Delete Set
 								</DropdownMenuItem>
 							</DropdownMenuContent>
 						</DropdownMenu>

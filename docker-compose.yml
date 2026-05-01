@@ -1,18 +1,51 @@
 services:
-  redis:
-    image: redis:7-alpine
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
     ports:
-      - "6379:6379"
-    restart: always
+      - "5000:5000"
+    environment:
+      - DATABASE_URL=${DATABASE_URL}
+      - JWT_SECRET=${JWT_SECRET}
+      - REDIS_URL=redis://redis:6379
+      - AI_PROCESSOR_URL=http://processor:8000
+    depends_on:
+      - redis
 
-  chromadb:
+  processor:
+    build:
+      context: apps/processor
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=${DATABASE_URL}
+      - REDIS_URL=redis://redis:6379
+      - CHROMA_HOST=${CHROMA_HOST:-chroma}
+      - CHROMA_PORT=${CHROMA_PORT:-8000}
+      - CHROMA_TENANT=${CHROMA_TENANT:-""}
+      - CHROMA_DATABASE=${CHROMA_DATABASE:-"default_database"}
+      - CHROMA_API_KEY=${CHROMA_API_KEY:-""}
+      - GROQ_API_KEY=${GROQ_API_KEY}
+      - GOOGLE_API_KEY=${GOOGLE_API_KEY}
+    depends_on:
+      - redis
+      - chroma
+
+  chroma:
     image: chromadb/chroma:latest
     ports:
-      - "8008:8000"
+      - "8001:8000"
     volumes:
-      - ./chroma_data:/chroma/chroma
-    restart: always
+      - chroma_data:/chroma/chroma
+    environment:
+      - IS_PERSISTENT=TRUE
 
-networks:
-  default:
-    name: dupi-network
+  redis:
+    image: redis:alpine
+    ports:
+      - "6379:6379"
+
+volumes:
+  chroma_data:

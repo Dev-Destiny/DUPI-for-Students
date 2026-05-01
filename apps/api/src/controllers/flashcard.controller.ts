@@ -2,8 +2,22 @@ import { Request, Response, NextFunction, RequestHandler } from "express";
 import * as flashcardService from "../services/flashcard.service";
 import { ApiError } from "../utils/ApiError";
 
+import * as generationService from "../services/generation.service";
+import { CreateFlashcardPayload, FlashcardIdParams, GenerateFlashcardsPayload, ReviewFlashcardPayload, UpdateFlashcardPayload } from "../types";
+
 export const generate = async (req: Request, res: Response, next: NextFunction) => {
-  res.json({ message: "Flashcard generation endpoint stub — needs AI service integration." });
+  try {
+    const userId = req.user?.userId;
+    if (!userId) throw new ApiError(401, "AUTH_REQUIRED", "Login required.");
+    
+    const { documentId, count: numCards, difficulty, topic } = req.body as GenerateFlashcardsPayload;
+    if (!documentId) throw new ApiError(400, "MISSING_DOC_ID", "documentId is required.");
+
+    const result = await generationService.generateFlashcards(documentId, userId, numCards, difficulty, topic);
+    res.json(result);
+  } catch (error) {
+    next(error);
+  }
 };
 
 export const list = async (req: Request, res: Response, next: NextFunction) => {
@@ -32,7 +46,7 @@ export const create = async (req: Request, res: Response, next: NextFunction) =>
   try {
     const userId = req.user?.userId;
     if (!userId) throw new ApiError(401, "AUTH_REQUIRED", "Login required.");
-    const flashcard = await flashcardService.createFlashcard(userId, req.body);
+    const flashcard = await flashcardService.createFlashcard(userId, req.body as CreateFlashcardPayload);
     res.status(201).json(flashcard);
   } catch (error) {
     next(error);
@@ -42,9 +56,9 @@ export const create = async (req: Request, res: Response, next: NextFunction) =>
 export const update = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const userId = req.user?.userId;
-    const id = req.params.id as string;
+    const { id } = req.params as unknown as FlashcardIdParams;
     if (!userId) throw new ApiError(401, "AUTH_REQUIRED", "Login required.");
-    const flashcard = await flashcardService.updateFlashcard(id, userId, req.body);
+    const flashcard = await flashcardService.updateFlashcard(id, userId, req.body as UpdateFlashcardPayload);
     res.json(flashcard);
   } catch (error) {
     next(error);
@@ -54,10 +68,22 @@ export const update = async (req: Request, res: Response, next: NextFunction) =>
 export const remove = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const userId = req.user?.userId;
-    const id = req.params.id as string;
+    const { id } = req.params as unknown as FlashcardIdParams;
     if (!userId) throw new ApiError(401, "AUTH_REQUIRED", "Login required.");
     const result = await flashcardService.deleteFlashcard(id, userId);
     res.json({ message: "Flashcard deleted successfully", result });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const removeBatch = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const userId = req.user?.userId;
+    const { documentId } = req.query as { documentId: string };
+    if (!userId) throw new ApiError(401, "AUTH_REQUIRED", "Login required.");
+    const result = await flashcardService.deleteFlashcardsByDocument(documentId, userId);
+    res.json({ message: "Flashcards deleted successfully", result });
   } catch (error) {
     next(error);
   }

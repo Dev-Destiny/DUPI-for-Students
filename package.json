@@ -1,9 +1,10 @@
 {
-  "name": "dupi-monorepo",
+  "name": "studify-monorepo",
   "version": "1.0.0",
   "private": true,
   "scripts": {
     "dev": "pnpm -r --parallel dev",
+    "db:generate": "cmd /c \"set PATH=%CD%\\apps\\processor\\venv\\Scripts;%PATH% && npx prisma generate --schema apps/api/prisma/schema.prisma\"",
     "build": "pnpm -r build",
     "lint": "pnpm -r lint",
     "clean": "pnpm -r clean"

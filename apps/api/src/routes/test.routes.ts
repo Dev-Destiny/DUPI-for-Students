@@ -1,7 +1,7 @@
 import { Router } from "express";
 import * as testController from "../controllers/test.controller";
 import { authenticate } from "../middlewares/auth.middleware";
-import { validate } from "../middlewares/validate.middleware";
+import { validate } from "../middlewares/validate.middleware";  
 import { 
   generateTestSchema, 
   shareTestSchema, 

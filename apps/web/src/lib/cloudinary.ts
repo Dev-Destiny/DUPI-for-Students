@@ -1,7 +1,7 @@
 export const CLOUDINARY_CONFIG = {
 	cloudName: import.meta.env.VITE_CLOUDINARY_CLOUD_NAME,
-	uploadPreset: "dupi_profile_images", // The preset you just created
-	folder: "dupi/profile_images",
+	uploadPreset: "studify_profile_images", // The preset you just created
+	folder: "studify/profile_images",
 };
 
 // Helper to build Cloudinary URLs

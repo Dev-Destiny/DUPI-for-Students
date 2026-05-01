@@ -6,4 +6,4 @@
 - **Pattern**: Use `motion` components (e.g., `motion.div`, `motion.button`) with `initial`, `animate`, `exit`, and `whileHover`/`whileTap` props.
 
 ## Documentation
-- **Continuous Update**: ALWAYS evolve PRD_DUPI.md with the latest changes in the project's aspects when working on features or updating tech stacks.
+- **Continuous Update**: ALWAYS evolve PRD_STUDIFY.md with the latest changes in the project's aspects when working on features or updating tech stacks.

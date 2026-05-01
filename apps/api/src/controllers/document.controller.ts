@@ -1,6 +1,8 @@
 import { RequestHandler } from "express";
 import { ApiError } from "../utils/ApiError";
 import * as documentService from "../services/document.service";
+import * as generationService from "../services/generation.service";
+import { DocumentIdParams } from "../types";
 
 export const upload: RequestHandler = async (req, res, next) => {
 	try {
@@ -42,7 +44,7 @@ export const list: RequestHandler = async (req, res, next) => {
 export const get: RequestHandler = async (req, res, next) => {
 	try {
 		const userId = req.user?.userId;
-		const id = req.params.id as string;
+		const { id } = req.params as unknown as DocumentIdParams;
 		if (!userId) {
 			throw new ApiError(401, "AUTH_REQUIRED", "USER_NOT_AUTHENTICATED");
 		}
@@ -57,7 +59,7 @@ export const get: RequestHandler = async (req, res, next) => {
 export const remove: RequestHandler = async (req, res, next) => {
 	try {
 		const userId = req.user?.userId;
-		const id = req.params.id as string;
+		const { id } = req.params as unknown as DocumentIdParams;
 		if (!userId) {
 			throw new ApiError(401, "AUTH_REQUIRED", "USER_NOT_AUTHENTICATED");
 		}
@@ -71,4 +73,19 @@ export const remove: RequestHandler = async (req, res, next) => {
 
 export const status: RequestHandler = async (req, res, next) => {
 	res.json({ message: "Document status endpoint stub" });
+};
+
+export const regenerateSummary: RequestHandler = async (req, res, next) => {
+	try {
+		const userId = req.user?.userId;
+		const { id } = req.params as unknown as DocumentIdParams;
+		if (!userId) {
+			throw new ApiError(401, "AUTH_REQUIRED", "USER_NOT_AUTHENTICATED");
+		}
+
+		const result = await generationService.generateSummary(id, userId);
+		res.json(result);
+	} catch (error) {
+		next(error);
+	}
 };

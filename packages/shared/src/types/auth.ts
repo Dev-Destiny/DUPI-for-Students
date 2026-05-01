@@ -1,3 +1,15 @@
+export interface UserPreferences {
+	aiTone?: string;
+	responseLength?: string;
+}
+
+export interface UserNotifications {
+	flashcardDue: boolean;
+	testResults: boolean;
+	weeklyReport: boolean;
+	productUpdates: boolean;
+}
+
 export interface User {
 	id: string;
 	email: string;
@@ -5,6 +17,8 @@ export interface User {
 	studyField?: string | null;
 	profileImageUrl?: string | null;
 	isOnboarded: boolean;
+	preferences?: UserPreferences | null;
+	notifications?: UserNotifications | null;
 	createdAt: Date | string;
 	updatedAt: Date | string;
 }
@@ -12,7 +26,7 @@ export interface User {
 export interface AuthResponse {
 	user: User;
 	accessToken: string;
-}
+} 
 
 export interface LoginResponse extends AuthResponse {}
 

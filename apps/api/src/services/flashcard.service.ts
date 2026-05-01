@@ -62,6 +62,17 @@ export const deleteFlashcard = async (id: string, userId: string) => {
   });
 };
 
+export const deleteFlashcardsByDocument = async (documentId: string, userId: string) => {
+  // If documentId is standalone, we might handle it differently, 
+  // but for now we assume it's a valid documentId or 'standalone'
+  return prisma.flashcard.deleteMany({
+    where: { 
+      documentId: documentId === 'standalone' ? null : documentId,
+      userId 
+    },
+  });
+};
+
 export const recordReview = async (id: string, userId: string, quality: number) => {
   const flashcard = await prisma.flashcard.findFirst({ where: { id, userId } });
   if (!flashcard) throw new ApiError(404, "NOT_FOUND", "Flashcard not found.");

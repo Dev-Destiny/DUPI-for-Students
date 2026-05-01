@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Check, Loader2 } from "lucide-react";
-import { Button, Input } from "@dupi/ui";
+import { Button, Input } from "@studify/ui";
 import { testService } from "@/services/test.service";
 import { flashcardService } from "@/services/flashcard.service";
 import { documentService } from "@/services/document.service";
@@ -36,6 +36,7 @@ export const GenerationModal: React.FC<GenerationModalProps> = ({
 	// Options
 	const [count, setCount] = useState(10);
 	const [difficulty, setDifficulty] = useState<"easy" | "medium" | "hard">("medium");
+	const [questionType, setQuestionType] = useState<"mcq" | "short_answer" | "mixed">("mcq");
 	const [topic, setTopic] = useState("");
 	
 	const [isGenerating, setIsGenerating] = useState(false);
@@ -81,11 +82,17 @@ export const GenerationModal: React.FC<GenerationModalProps> = ({
 					documentId: selectedDocId,
 					topic: topic || undefined,
 					count,
-					difficulty
+					difficulty,
+					questionType
 				});
 				toast.success("Practice test generated successfully!");
 			} else {
-				await flashcardService.generateFlashcards(selectedDocId!, count);
+				await flashcardService.generateFlashcards({
+					documentId: selectedDocId!,
+					count,
+					difficulty,
+					topic: topic || undefined
+				});
 				toast.success("Flashcard deck generated successfully!");
 			}
 			setStep(3);
@@ -264,6 +271,37 @@ export const GenerationModal: React.FC<GenerationModalProps> = ({
 													/>
 												</div>
 											</div>
+
+											{/* Question Type (Only for Tests) */}
+											{type === "test" && (
+												<div className='space-y-3'>
+													<label className='text-sm font-medium text-foreground'>
+														Question Type
+													</label>
+													<div className='flex p-1 rounded-xl bg-muted/50 relative'>
+														{["mcq", "short_answer", "mixed"].map((t) => (
+															<button
+																key={t}
+																onClick={() => setQuestionType(t as any)}
+																className={`flex-1 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-colors relative z-10 ${
+																	questionType === t ? "text-background" : "text-muted-foreground hover:text-foreground"
+																}`}
+															>
+																{t.replace("_", " ")}
+															</button>
+														))}
+														<motion.div 
+															className='absolute inset-y-1 bg-foreground rounded-lg shadow-sm'
+															initial={false}
+															animate={{ 
+																left: questionType === "mcq" ? "4px" : questionType === "short_answer" ? "33.3%" : "66.6%",
+																width: "calc(33.3% - 4px)"
+															}}
+															transition={springConfig}
+														/>
+													</div>
+												</div>
+											)}
 
 											{/* Topic Input */}
 											<div className='space-y-3'>

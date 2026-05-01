@@ -18,6 +18,7 @@ export const generateTestSchema = z.object({
     topic: z.string().optional(),
     count: z.number().int().min(1).max(20).optional(),
     difficulty: z.enum(["easy", "medium", "hard"]).optional(),
+    questionType: z.enum(["mcq", "short_answer", "mixed"]).optional(),
   }),
 });
 

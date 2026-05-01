@@ -38,7 +38,7 @@ export const WelcomeScreen: FC<{ onNext: () => void; onSkip: () => void }> = ({
 					transition={{ delay: 0.1 }}
 					className='text-5xl md:text-6xl font-bold text-foreground tracking-tight font-grotesk'
 				>
-					Welcome to <span className='text-brand-orange'>DUPI</span>
+					Welcome to <span className='text-brand-orange'>Studify</span>
 				</motion.h1>
 				<motion.p
 					initial={{ opacity: 0, y: 16 }}

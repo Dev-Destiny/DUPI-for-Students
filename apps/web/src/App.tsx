@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
+import { GoogleOAuthProvider } from "@react-oauth/google";
 import { Toaster } from "sonner";
 import { useAuthStore } from "./store/auth.store";
 import LoginPage from "./modules/auth/pages/LoginPage";
@@ -34,9 +35,10 @@ function App() {
 	}
 
 	return (
-		<>
+		<GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
 			<Toaster position='top-right' richColors expand={false} />
 			<Routes>
+				{/* ... existing routes ... */}
 				{/* Public Routes */}
 				<Route
 					path='/login'
@@ -178,7 +180,7 @@ function App() {
 				{/* 404 Redirect */}
 				<Route path='*' element={<Navigate to='/' replace />} />
 			</Routes>
-		</>
+		</GoogleOAuthProvider>
 	);
 }
 

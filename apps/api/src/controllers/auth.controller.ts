@@ -1,11 +1,11 @@
 import { RequestHandler } from "express";
 import * as authService from "../services/auth.service";
-import { LoginUserPayload, RegisterUserPayload, UpdateUserPayload } from "src/types/auth.types";
-import prisma from "src/lib/prisma";
+import { RegisterPayload, LoginPayload, UpdateProfilePayload, GoogleLoginPayload } from "../types";
+import prisma from "../lib/prisma";
 
 export const register: RequestHandler = async (req, res, next) => {
   try {
-    const { user, accessToken, refreshToken } = await authService.registerUser(req.body as RegisterUserPayload);
+    const { user, accessToken, refreshToken } = await authService.registerUser(req.body as RegisterPayload);
     
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
@@ -22,7 +22,7 @@ export const register: RequestHandler = async (req, res, next) => {
 
 export const login: RequestHandler = async (req, res , next) => {
   try {
-    const { user, accessToken, refreshToken } = await authService.loginUser(req.body as LoginUserPayload);
+    const { user, accessToken, refreshToken } = await authService.loginUser(req.body as LoginPayload);
     
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
@@ -94,7 +94,7 @@ export const me: RequestHandler = async (req, res, next) => {
 
 export const updateProfile: RequestHandler = async (req, res, next) => {
   try {
-    const user = await authService.updateUser(req.user!.userId, req.body as UpdateUserPayload);
+    const user = await authService.updateUser(req.user!.userId, req.body as UpdateProfilePayload);
     res.json(user);
   } catch (error) {
     next(error);
@@ -111,4 +111,39 @@ export const forgotPassword: RequestHandler = async (req, res, next) => {
 
 export const resetPassword: RequestHandler = async (req, res, next) => {
   res.json({ message: "Reset password not implemented in MVP base" });
+};
+
+export const googleLogin: RequestHandler = async (req, res, next) => {
+  try {
+    const { user, accessToken, refreshToken } = await authService.googleLogin(req.body as GoogleLoginPayload);
+    
+    res.cookie("refreshToken", refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+
+    res.json({ user, accessToken });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const changePassword: RequestHandler = async (req, res, next) => {
+  try {
+    const result = await authService.changePassword(req.user!.userId, req.body);
+    res.json(result);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const updateSettings: RequestHandler = async (req, res, next) => {
+  try {
+    const user = await authService.updateUserSettings(req.user!.userId, req.body);
+    res.json(user);
+  } catch (error) {
+    next(error);
+  }
 };

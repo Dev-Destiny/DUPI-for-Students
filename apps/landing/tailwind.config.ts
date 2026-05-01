@@ -1,5 +1,5 @@
 import type { Config } from 'tailwindcss'
-import { solarNeonPreset } from '@dupi/ui/tailwind.config'
+import { solarNeonPreset } from '@studify/ui/tailwind.config'
 
 export default {
   content: [

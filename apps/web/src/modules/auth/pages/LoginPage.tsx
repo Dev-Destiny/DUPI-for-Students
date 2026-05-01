@@ -4,16 +4,36 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { motion } from "framer-motion";
 import { Eye, EyeOff, Mail, Lock, ArrowRight, X } from "lucide-react";
-import { Button } from "@dupi/ui/components/ui/button";
-import { Input } from "@dupi/ui/components/ui/input";
-import { loginSchema, type LoginInput } from "@dupi/shared";
+import { Button } from "@studify/ui/components/ui/button";
+import { Input } from "@studify/ui/components/ui/input";
+import { loginSchema, type LoginInput } from "@studify/shared";
 import { useAuthStore } from "../../../store/auth.store";
+import { useGoogleLogin } from "@react-oauth/google";
+import { toast } from "sonner";
 import AuthLayout from "../layouts/AuthLayout";
 
 const LoginPage: FC = () => {
 	const navigate = useNavigate();
 	const location = useLocation();
-	const { login, isLoading, error, clearError } = useAuthStore();
+	const { login, loginWithGoogle, isLoading, error, clearError } = useAuthStore();
+
+	const handleGoogleLogin = useGoogleLogin({
+		flow: "auth-code",
+		onSuccess: async (codeResponse) => {
+			console.log("[DEBUG] Google Login Success:", codeResponse);
+			try {
+				toast.loading("Authenticating with Google...", { id: "google-auth" });
+				await loginWithGoogle(codeResponse.code);
+				toast.success("Welcome to Studify!", { id: "google-auth" });
+				navigate("/dashboard");
+			} catch (err) {
+				toast.error("Google authentication failed", { id: "google-auth" });
+			}
+		},
+		onError: () => {
+			toast.error("Google Login Cancelled");
+		},
+	});
 
 	const {
 		register,
@@ -74,27 +94,27 @@ const LoginPage: FC = () => {
 				{/* Header */}
 				<motion.div
 					variants={itemVariants}
-					className='mb-8 text-center'
+					className='mb-10 text-left'
 				>
-					<h1 className='text-3xl font-bold tracking-tight text-foreground'>
-						Welcome back
+					<h1 className='text-4xl font-serif text-foreground tracking-tight mb-2'>
+						Sign in
 					</h1>
-					<p className='mt-2 text-muted-foreground'>
-						Sign in to generate your next AI-powered assessment.
+					<p className='text-sm text-muted-foreground font-medium'>
+						Access your academic workspace and AI-powered study aids.
 					</p>
 					{error && (
 						<motion.div
-							initial={{ opacity: 0, scale: 0.95 }}
-							animate={{ opacity: 1, scale: 1 }}
-							className='mt-4 p-3 rounded-xl bg-destructive/10 border border-destructive/20 text-destructive text-xs font-medium flex justify-between items-center'
+							initial={{ opacity: 0, y: -10 }}
+							animate={{ opacity: 1, y: 0 }}
+							className='mt-6 p-4 rounded-xl bg-destructive/5 border border-destructive/20 text-destructive text-xs font-bold flex justify-between items-center'
 						>
-							<span>{error}</span>
+							<span className='uppercase tracking-wide'>{error}</span>
 							<button
 								type='button'
 								onClick={clearError}
 								className='hover:opacity-70 transition-opacity'
 							>
-								<X className='w-3 h-3' />
+								<X className='w-4 h-4' />
 							</button>
 						</motion.div>
 					)}
@@ -109,6 +129,8 @@ const LoginPage: FC = () => {
 						className='flex-1 h-11 rounded-xl gap-2 text-sm'
 					>
 						<motion.button
+							type='button'
+							onClick={() => handleGoogleLogin()}
 							whileHover={{
 								y: -2,
 								scale: 1.02,
@@ -164,13 +186,13 @@ const LoginPage: FC = () => {
 				</motion.div>
 
 				{/* Divider */}
-				<motion.div variants={itemVariants} className='relative mb-6'>
+				<motion.div variants={itemVariants} className='relative my-8'>
 					<div className='absolute inset-0 flex items-center'>
-						<div className='w-full border-t border-border' />
+						<div className='w-full border-t border-border/50' />
 					</div>
-					<div className='relative flex justify-center text-[10px] uppercase tracking-widest'>
-						<span className='bg-card px-3 text-muted-foreground/50 font-bold uppercase'>
-							Secure email sign in
+					<div className='relative flex justify-center text-[10px] uppercase tracking-[0.2em] font-black'>
+						<span className='bg-background px-4 text-muted-foreground/40'>
+							Or continue with
 						</span>
 					</div>
 				</motion.div>
@@ -199,7 +221,7 @@ const LoginPage: FC = () => {
 								type='email'
 								placeholder='name@example.com'
 								{...register("email")}
-								className='pl-11 h-12 rounded-2xl border-border bg-muted/30 focus:bg-muted/50 focus:ring-4 focus:ring-brand-orange/5 focus:border-brand-orange/50 transition-all font-medium'
+								className='pl-11 h-12 rounded-xl border-border bg-muted/20 focus:bg-background focus:ring-1 focus:ring-brand-orange/40 transition-all font-medium text-sm'
 							/>
 						</div>
 					</motion.div>
@@ -233,7 +255,7 @@ const LoginPage: FC = () => {
 								type={showPassword ? "text" : "password"}
 								placeholder='••••••••'
 								{...register("password")}
-								className='pl-11 pr-11 h-12 rounded-2xl border-border bg-muted/30 focus:bg-muted/50 focus:ring-4 focus:ring-brand-orange/5 focus:border-brand-orange/50 transition-all font-medium'
+								className='pl-11 h-12 rounded-xl border-border bg-muted/20 focus:bg-background focus:ring-1 focus:ring-brand-orange/40 transition-all font-medium text-sm'
 							/>
 							<motion.button
 								type='button'
@@ -251,34 +273,28 @@ const LoginPage: FC = () => {
 					</motion.div>
 
 					{/* Submit */}
-					<motion.div variants={itemVariants} className='pt-2'>
+					<motion.div variants={itemVariants} className='pt-4'>
 						<Button
-							asChild
 							type='submit'
 							disabled={isLoading}
-							className='w-full h-13 rounded-full font-bold text-base shadow-md group'
+							className='w-full h-12 rounded-xl font-black text-xs uppercase tracking-widest transition-all hover:scale-[1.01] active:scale-[0.99] shadow-lg shadow-brand-orange/10'
 						>
-							<motion.button
-								whileHover={{ scale: 1.02 }}
-								whileTap={{ scale: 0.97 }}
-							>
-								{isLoading ? (
-									<motion.div
-										className='w-5 h-5 border-2 border-white/30 border-t-white rounded-full'
-										animate={{ rotate: 360 }}
-										transition={{
-											duration: 0.6,
-											repeat: Infinity,
-											ease: "linear",
-										}}
-									/>
-								) : (
-									<span className='flex items-center justify-center gap-2'>
-										Sign In
-										<ArrowRight className='w-4 h-4 group-hover:translate-x-1 transition-transform' />
-									</span>
-								)}
-							</motion.button>
+							{isLoading ? (
+								<motion.div
+									className='w-4 h-4 border-2 border-white/30 border-t-white rounded-full'
+									animate={{ rotate: 360 }}
+									transition={{
+										duration: 0.6,
+										repeat: Infinity,
+										ease: "linear",
+									}}
+								/>
+							) : (
+								<span className='flex items-center justify-center gap-2'>
+									Authenticate
+									<ArrowRight className='w-4 h-4' />
+								</span>
+							)}
 						</Button>
 					</motion.div>
 				</form>
@@ -288,7 +304,7 @@ const LoginPage: FC = () => {
 					variants={itemVariants}
 					className='mt-8 text-center text-sm text-muted-foreground'
 				>
-					New to DUPI?{" "}
+					New to Studify?{" "}
 					<Link
 						to='/signup'
 						className='text-brand-orange hover:text-primary font-bold transition-colors'

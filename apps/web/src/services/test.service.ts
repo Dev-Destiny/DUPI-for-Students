@@ -11,7 +11,7 @@ export const testService = {
     return response.data;
   },
 
-  generateTest: async (data: { documentId?: string; topic?: string; count?: number; difficulty?: string }) => {
+  generateTest: async (data: { documentId?: string; topic?: string; count?: number; difficulty?: string; questionType?: string }) => {
     const response = await api.post("/tests/generate", data);
     return response.data;
   },
@@ -23,6 +23,10 @@ export const testService = {
 
   getAttempts: async (id: string) => {
     const response = await api.get(`/tests/${id}/attempts`);
+    return response.data;
+  },
+  deleteTest: async (id: string) => {
+    const response = await api.delete(`/tests/${id}`);
     return response.data;
   },
 };

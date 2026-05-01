@@ -7,7 +7,7 @@ const testimonials = [
 		name: "Sarah Chen",
 		role: "Med Student @ Stanford",
 		content:
-			"DUPI turned my 400-page pathology textbook into quizzes I actually enjoy doing. Saved my finals week.",
+			"Studify turned my 400-page pathology textbook into quizzes I actually enjoy doing. Saved my finals week.",
 		avatarColor: "bg-gradient-to-br from-primary to-brand-violet",
 	},
 	{
@@ -21,7 +21,7 @@ const testimonials = [
 		name: "Dr. Emily Alcott",
 		role: "Professor of Biology",
 		content:
-			"I recommend DUPI to all my students. It forces them to engage with the material actively instead of just highlighting.",
+			"I recommend Studify to all my students. It forces them to engage with the material actively instead of just highlighting.",
 		avatarColor: "bg-gradient-to-br from-emerald-500 to-teal-500",
 	},
 	{
@@ -57,7 +57,7 @@ const Testimonials: FC = () => {
 					</h2>
 					<p className='text-muted-foreground text-lg font-medium max-w-xl mx-auto'>
 						Join thousands of students and educators who are
-						leveling up their mastery with DUPI AI.
+						leveling up their mastery with Studify AI.
 					</p>
 				</motion.div>
 			</div>

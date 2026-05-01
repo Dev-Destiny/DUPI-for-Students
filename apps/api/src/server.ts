@@ -10,6 +10,7 @@ import authRouter from "./routes/auth.routes";
 import documentRouter from "./routes/document.routes";
 import testRouter from "./routes/test.routes";
 import flashcardRouter from "./routes/flashcard.routes";
+import analyticsRouter from "./routes/analytics.routes";
 import { errorHandler } from "./middlewares/error.middleware";
 
 // Node.js worker disabled - background processing moved to /apps/processor (Python)
@@ -27,7 +28,7 @@ app.use(morgan("dev"));
 app.use(
   rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 100, // Limit each IP to 100 requests per windowMs
+    max: 1000, // Limit each IP to 100 requests per windowMs
     message: "Too many requests from this IP, please try again after 15 minutes",
   })
 );
@@ -53,17 +54,20 @@ app.get("/health", (req, res) => {
 app.use(express.json());
 app.use(cookieParser());
 
+
+
 // Routes
 app.use("/api/auth", authRouter);
 app.use("/api/documents", documentRouter);
 app.use("/api/tests", testRouter);
 app.use("/api/flashcards", flashcardRouter);
+app.use("/api/analytics", analyticsRouter);
 
 // Error Handler
 app.use(errorHandler);
 
 const PORT = env.PORT;
 
-app.listen(PORT, () => {
-  console.log(`🚀 DUPI API is running on port ${PORT} [${env.NODE_ENV}]`);
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`🚀 Studify API is running on port ${PORT} [${env.NODE_ENV}]`);
 });

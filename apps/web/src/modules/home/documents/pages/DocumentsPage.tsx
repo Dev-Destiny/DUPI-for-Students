@@ -8,7 +8,7 @@ import {
 	Layers,
 	Filter,
 } from "lucide-react";
-import { Button, Input, ScrollArea } from "@dupi/ui";
+import { Button, Input, ScrollArea } from "@studify/ui";
 import { DocumentCard } from "../components/DocumentCard";
 import { DocumentsSidebar } from "../components/DocumentsSidebar";
 import { UploadModal } from "../components/UploadModal";
@@ -38,15 +38,17 @@ const DocumentsPage: React.FC = () => {
 			const formatted = docs.map((doc: any) => ({
 				id: doc.id,
 				title: doc.title,
-				size: doc.fileSizeBytes 
-					? (doc.fileSizeBytes / 1024 / 1024).toFixed(1) + "MB" 
+				size: doc.fileSizeBytes
+					? (doc.fileSizeBytes / 1024 / 1024).toFixed(1) + "MB"
 					: "Unknown",
 				pages: null,
-				status: doc.processed 
-					? "processed" 
-					: (doc.processingError ? "error" : "analyzing"),
+				status: doc.processed
+					? "processed"
+					: doc.processingError
+						? "error"
+						: "analyzing",
 				uploadedAt: new Date(doc.createdAt).toLocaleDateString(),
-				type: doc.title.split('.').pop() || "doc",
+				type: doc.title.split(".").pop() || "doc",
 				progress: doc.processed ? 100 : 50,
 			}));
 			setDocuments(formatted);
@@ -62,7 +64,7 @@ const DocumentsPage: React.FC = () => {
 	}, []);
 
 	const filteredDocs = documents.filter((doc) =>
-		doc.title.toLowerCase().includes(searchQuery.toLowerCase())
+		doc.title.toLowerCase().includes(searchQuery.toLowerCase()),
 	);
 
 	const handleUploadDocument = () => {
@@ -90,7 +92,7 @@ const DocumentsPage: React.FC = () => {
 								</p>
 							</div>
 
-							<Button 
+							<Button
 								onClick={handleUploadDocument}
 								className='h-11 rounded-full px-6 gap-2 font-bold shadow-lg shadow-brand-orange/10 transition-all hover:scale-105 active:scale-95'
 							>
@@ -139,7 +141,9 @@ const DocumentsPage: React.FC = () => {
 						{/* Documents Grid */}
 						{isLoading ? (
 							<div className='flex items-center justify-center py-24'>
-								<p className='text-muted-foreground font-black uppercase tracking-widest text-xs animate-pulse'>Loading Documents...</p>
+								<p className='text-muted-foreground font-black uppercase tracking-widest text-xs animate-pulse'>
+									Loading Documents...
+								</p>
 							</div>
 						) : (
 							<motion.div
@@ -148,7 +152,15 @@ const DocumentsPage: React.FC = () => {
 							>
 								<AnimatePresence>
 									{filteredDocs.map((doc) => (
-										<DocumentCard key={doc.id} doc={doc} />
+										<DocumentCard
+											key={doc.id}
+											doc={doc}
+											onDelete={(id) => {
+												setDocuments((prev) =>
+													prev.filter((d) => d.id !== id),
+												);
+											}}
+										/>
 									))}
 								</AnimatePresence>
 							</motion.div>
@@ -182,10 +194,10 @@ const DocumentsPage: React.FC = () => {
 			</div>
 
 			<DocumentsSidebar />
-			
-			<UploadModal 
-				isOpen={isUploadModalOpen} 
-				onClose={() => setIsUploadModalOpen(false)} 
+
+			<UploadModal
+				isOpen={isUploadModalOpen}
+				onClose={() => setIsUploadModalOpen(false)}
 				onUploadComplete={() => {
 					fetchDocuments();
 				}}

@@ -72,7 +72,7 @@ const Features: FC = () => {
 								AI-Powered Question Generation
 							</h3>
 							<p className='text-muted-foreground max-w-sm text-lg leading-relaxed'>
-								Not just flashcards. DUPI creates
+								Not just flashcards. Studify creates
 								multiple-choice, open-ended, and scenario-based
 								questions that test deep understanding.
 							</p>

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeft, RotateCcw, Home, Loader2, Sparkles } from "lucide-react";
-import { Button, Card } from "@dupi/ui";
+import { Button, Card } from "@studify/ui";
 import { flashcardService } from "@/services/flashcard.service";
 import { toast } from "sonner";
 
@@ -11,11 +11,11 @@ const spring = { type: "spring", stiffness: 260, damping: 30 };
 interface Flashcard { id: string; front: string; back: string; masteryLevel?: number; }
 
 const reviewOptions = [
-	{ q: 1, label: "Forgot", color: "border-destructive/30 bg-destructive/5 text-destructive hover:bg-destructive/10" },
-	{ q: 2, label: "Hard", color: "border-orange-500/30 bg-orange-500/5 text-orange-500 hover:bg-orange-500/10" },
-	{ q: 3, label: "Okay", color: "border-brand-gold/30 bg-brand-gold/5 text-brand-gold hover:bg-brand-gold/10" },
-	{ q: 4, label: "Good", color: "border-brand-violet/30 bg-brand-violet/5 text-brand-violet hover:bg-brand-violet/10" },
-	{ q: 5, label: "Perfect", color: "border-emerald-500/30 bg-emerald-500/5 text-emerald-500 hover:bg-emerald-500/10" },
+	{ q: 1, label: "Forgot", color: "border-destructive/30 bg-destructive/5 text-destructive hover:bg-destructive/10 hover:shadow-destructive/10 hover:glow-red" },
+	{ q: 2, label: "Hazy", color: "border-orange-500/30 bg-orange-500/5 text-orange-500 hover:bg-orange-500/10 hover:glow-orange" },
+	{ q: 3, label: "Okay", color: "border-brand-gold/30 bg-brand-gold/5 text-brand-gold hover:bg-brand-gold/10 hover:glow-gold" },
+	{ q: 4, label: "Clear", color: "border-brand-violet/30 bg-brand-violet/5 text-brand-violet hover:bg-brand-violet/10 hover:glow-violet" },
+	{ q: 5, label: "Mastered", color: "border-emerald-500/30 bg-emerald-500/5 text-emerald-500 hover:bg-emerald-500/10 hover:glow-emerald" },
 ];
 
 const FlashcardSessionPage: React.FC = () => {
@@ -28,6 +28,7 @@ const FlashcardSessionPage: React.FC = () => {
 	const [isComplete, setIsComplete] = useState(false);
 	const [isTransitioning, setIsTransitioning] = useState(false);
 	const [reviewedCount, setReviewedCount] = useState(0);
+	const [hoveredQuality, setHoveredQuality] = useState<number | null>(null);
 
 	useEffect(() => {
 		const fetchCards = async () => {
@@ -127,6 +128,19 @@ const FlashcardSessionPage: React.FC = () => {
 				</div>
 			</div>
 
+			{/* Background Glow */}
+			<div className='fixed inset-0 pointer-events-none overflow-hidden -z-10 transition-colors duration-500'>
+				<motion.div 
+					className={`absolute inset-0 opacity-[0.03] transition-colors duration-500 ${
+						hoveredQuality === 1 ? "bg-red-500" :
+						hoveredQuality === 2 ? "bg-orange-500" :
+						hoveredQuality === 3 ? "bg-brand-gold" :
+						hoveredQuality === 4 ? "bg-brand-violet" :
+						hoveredQuality === 5 ? "bg-emerald-500" : "bg-transparent"
+					}`}
+				/>
+			</div>
+
 			{/* Card Area */}
 			<main className='flex-1 flex flex-col items-center justify-center px-6 py-8'>
 				<AnimatePresence mode='wait'>
@@ -139,11 +153,14 @@ const FlashcardSessionPage: React.FC = () => {
 						className='w-full max-w-xl perspective-1000'
 					>
 						<motion.div 
-							className='relative w-full h-[400px] md:h-[440px] cursor-pointer preserve-3d'
+							className='relative w-full h-[400px] md:h-[480px] cursor-pointer preserve-3d group shadow-[0_20px_50px_rgba(0,0,0,0.2)] rounded-[2.5rem]'
 							animate={{ rotateY: isFlipped ? 180 : 0 }}
-							transition={{ type: "spring", stiffness: 260, damping: 20 }}
+							transition={{ type: "spring", stiffness: 200, damping: 25 }}
 							onClick={() => !isTransitioning && setIsFlipped(!isFlipped)}
 						>
+							{/* Floating Decorative Elements */}
+							<div className='absolute -top-12 -right-12 w-32 h-32 bg-brand-orange/5 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-700' />
+							<div className='absolute -bottom-12 -left-12 w-32 h-32 bg-brand-violet/5 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-700' />
 							{/* Front */}
 							<Card className='absolute inset-0 backface-hidden flex flex-col items-center justify-center p-8 md:p-12 bg-card border-border/30 shadow-soft rounded-[2.5rem] text-center'>
 								<span className='px-3 py-1 rounded-full bg-muted/30 border border-border/30 text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-8'>
@@ -167,6 +184,12 @@ const FlashcardSessionPage: React.FC = () => {
 									<p className='text-lg md:text-xl font-serif leading-relaxed text-foreground'>
 										{currentCard?.back}
 									</p>
+								</div>
+								<div className='mt-8 pt-6 border-t border-border/10 w-full'>
+									<button className='flex items-center gap-2 mx-auto px-4 py-2 rounded-xl bg-muted/30 border border-border/30 text-[10px] font-black uppercase tracking-widest text-muted-foreground hover:bg-muted/50 transition-colors'>
+										<Sparkles className='size-3 text-brand-orange' />
+										View Source Reference
+									</button>
 								</div>
 								<p className='mt-auto text-[10px] font-bold uppercase tracking-widest text-muted-foreground/30'>Review below</p>
 							</Card>
@@ -195,10 +218,12 @@ const FlashcardSessionPage: React.FC = () => {
 									{reviewOptions.map((opt) => (
 										<motion.button 
 											key={opt.q} 
-											whileHover={{ y: -2, scale: 1.05 }}
+											whileHover={{ y: -4, scale: 1.05 }}
 											whileTap={{ scale: 0.95 }}
+											onMouseEnter={() => setHoveredQuality(opt.q)}
+											onMouseLeave={() => setHoveredQuality(null)}
 											onClick={() => handleReview(opt.q)}
-											className={`px-5 py-2.5 rounded-2xl border text-xs font-bold transition-shadow hover:shadow-lg ${opt.color}`}
+											className={`px-5 py-2.5 rounded-2xl border text-xs font-black uppercase tracking-widest transition-all ${opt.color}`}
 										>
 											{opt.label}
 										</motion.button>

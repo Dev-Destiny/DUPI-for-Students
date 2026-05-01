@@ -1,7 +1,7 @@
 import { type FC, useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Link } from "react-router-dom";
-import { Button } from "@dupi/ui/components/ui/button";
+import { Button } from "@studify/ui/components/ui/button";
 import toast from "react-hot-toast";
 
 const Hero: FC = () => {
@@ -89,7 +89,7 @@ const Hero: FC = () => {
 							animate={{ opacity: 1, y: 0 }}
 							transition={{ ...springConfig, delay: 0.2 }}
 						>
-							DUPI uses advanced AI to analyze your PDFs, lecture
+							Studify uses advanced AI to analyze your PDFs, lecture
 							notes, and slides to create personalized practice
 							exams that actually help you learn.
 						</motion.p>

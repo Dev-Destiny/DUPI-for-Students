@@ -3,12 +3,15 @@ import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
 async function main() {
-  const user = await prisma.user.findFirst();
-
-  if (!user) {
-    console.error("No user found. Please register a user first.");
-    return;
-  }
+  const user = await prisma.user.upsert({
+    where: { email: "middle@man.com" },
+    update: {},
+    create: {
+      email: "middle@man.com",
+      displayName: "Middleman",
+      passwordHash: "$2b$10$abcdefghijklmnopqrstuvwxyzaBCDEFGHIJKLMNOPQRSTUV", // Mock hash
+    }
+  });
 
   console.log(`Seeding data for user: ${user.email} (${user.id})`);
 

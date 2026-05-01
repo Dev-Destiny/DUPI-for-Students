@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Input } from "@dupi/ui";
-import { Filter, Search, Layers } from "lucide-react";
+import { Input } from "@studify/ui";
+import { Filter, Search, Layers, Plus } from "lucide-react";
 import { FlashcardSetCard } from "../components/FlashcardSetCard";
 import { flashcardService } from "@/services/flashcard.service";
 import { GenerationModal } from "@/components/modals/GenerationModal";
@@ -35,16 +35,38 @@ const FlashcardsPage: React.FC = () => {
 						documentName: card.document?.title || "Manual added",
 						cardsCount: 0,
 						mastery: 0,
-						status: "learning",
+						status: "new",
 						dueForReview: 0,
+						masteredCount: 0,
+						learningCount: 0,
 					};
 				}
 				grouped[docId].cardsCount++;
+				
+				// Mastery logic: easeFactor >= 2.5 and repetitions >= 3
+				const isMastered = Number(card.easeFactor) >= 2.5 && card.repetitions >= 3;
+				if (isMastered) {
+					grouped[docId].masteredCount++;
+				} else if (card.repetitions > 0) {
+					grouped[docId].learningCount++;
+				}
+
 				if (card.nextReview && new Date(card.nextReview) < new Date()) {
 					grouped[docId].dueForReview++;
 				}
 			});
-			setFlashcardSets(Object.values(grouped));
+
+			// Finalize mastery percentage and status for each set
+			const finalized = Object.values(grouped).map(set => {
+				const mastery = Math.round((set.masteredCount / set.cardsCount) * 100);
+				let status = "new";
+				if (mastery >= 80) status = "mastered";
+				else if (set.learningCount > 0 || set.masteredCount > 0) status = "learning";
+				
+				return { ...set, mastery, status };
+			});
+
+			setFlashcardSets(finalized);
 		} catch (error) {
 			console.error("Failed to fetch flashcards:", error);
 		} finally {
@@ -78,7 +100,7 @@ const FlashcardsPage: React.FC = () => {
 
 			{/* Refined Header area */}
 			<div className='px-4 md:px-8 pt-8 md:pt-10 pb-6 border-b border-border/50 bg-background/50 backdrop-blur-md sticky top-0 z-10'>
-				<div className='flex flex-col md:flex-row md:items-end justify-between gap-6'>
+				<div className='flex flex-col lg:flex-row lg:items-end justify-between gap-6'>
 					<div className='relative z-10'>
 						<motion.div
 							initial={{ opacity: 0, y: -10 }}
@@ -112,7 +134,7 @@ const FlashcardsPage: React.FC = () => {
 						initial={{ opacity: 0, scale: 0.95 }}
 						animate={{ opacity: 1, scale: 1 }}
 						transition={{ delay: 0.15 }}
-						className='flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto relative z-10'
+						className='flex flex-col sm:flex-row lg:flex-row items-center gap-3 w-full lg:w-auto relative z-10'
 					>
 						<div className='relative w-full sm:w-64'>
 							<Search className='absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground' />
@@ -123,6 +145,13 @@ const FlashcardsPage: React.FC = () => {
 								onChange={(e) => setSearchQuery(e.target.value)}
 							/>
 						</div>
+						<button 
+							onClick={() => setIsModalOpen(true)}
+							className='flex items-center justify-center gap-2 h-11 px-6 bg-brand-orange text-white rounded-xl hover:bg-brand-orange/90 transition-all font-bold text-xs uppercase tracking-widest shadow-[0_0_20px_rgba(255,111,32,0.3)] w-full sm:w-auto'
+						>
+							<Plus className='size-4' />
+							Create New Deck
+						</button>
 						<button className='flex items-center justify-center gap-2 h-11 px-4 bg-card/50 border border-border rounded-xl text-muted-foreground hover:text-brand-orange hover:bg-brand-orange/5 hover:border-brand-orange/30 transition-all font-bold text-xs uppercase tracking-wider shrink-0 w-full sm:w-auto shadow-sm'>
 							<Filter className='size-4' />
 							Filter
@@ -132,13 +161,13 @@ const FlashcardsPage: React.FC = () => {
 			</div>
 
 			{/* Filter Tabs */}
-			<div className='px-4 md:px-8 py-4 md:py-5 border-b border-border/50 bg-background/30 backdrop-blur-sm sticky top-[180px] md:top-[160px] z-10'>
-				<div className='flex items-center gap-2 overflow-x-auto pb-2 -mb-2 custom-scrollbar hide-scroll-indicator'>
+			<div className='px-4 md:px-8 py-4 md:py-5 border-b border-border/50 bg-background/30 backdrop-blur-sm sticky top-[180px] lg:top-[160px] z-10'>
+				<div className='flex items-center gap-2 overflow-x-auto pb-2 -mb-2 custom-scrollbar hide-scroll-indicator snap-x snap-mandatory'>
 					{Tabs.map((tab) => (
 						<button
 							key={tab}
 							onClick={() => setActiveTab(tab)}
-							className={`relative px-5 py-2.5 rounded-xl text-xs font-bold whitespace-nowrap transition-colors duration-300 z-10 ${
+							className={`relative px-5 py-2.5 rounded-xl text-xs font-bold whitespace-nowrap transition-colors duration-300 z-10 snap-start ${
 								activeTab === tab
 									? "text-brand-orange"
 									: "text-muted-foreground hover:text-foreground"
@@ -180,7 +209,12 @@ const FlashcardsPage: React.FC = () => {
 									animate={{ opacity: 1, y: 0 }}
 									transition={{ delay: i * 0.05 + 0.2 }}
 								>
-									<FlashcardSetCard set={set} />
+									<FlashcardSetCard 
+										set={set} 
+										onDelete={(id) => {
+											setFlashcardSets(prev => prev.filter(s => s.id !== id));
+										}}
+									/>
 								</motion.div>
 							))}
 						</motion.div>

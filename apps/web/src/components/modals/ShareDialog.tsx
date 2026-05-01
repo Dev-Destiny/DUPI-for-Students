@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Check } from "lucide-react";
-import { Input } from "@dupi/ui";
+import { Input } from "@studify/ui";
 
 const spring = { type: "spring", stiffness: 260, damping: 30 };
 

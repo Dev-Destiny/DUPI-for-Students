@@ -1,4 +1,4 @@
-import { Button } from "@dupi/ui/components/ui/button";
+import { Button } from "@studify/ui/components/ui/button";
 import { type FC, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Link } from "react-router-dom";
@@ -24,10 +24,10 @@ const Navbar: FC = () => {
 						whileTap={{ scale: 0.95 }}
 					>
 						<span className='font-grotesk font-bold tracking-tighter text-foreground text-3xl flex items-center gap-[4px]'>
-							dupi
+							studify
 							<img
-								src='/image/dupi-mark.svg'
-								alt='DUPI logo'
+								src='/image/studify-mark.svg'
+								alt='Studify logo'
 								className='h-6 w-6'
 							/>
 						</span>

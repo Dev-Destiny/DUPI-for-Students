@@ -11,8 +11,8 @@ export const flashcardService = {
     return response.data;
   },
 
-  generateFlashcards: async (documentId: string, count?: number) => {
-    const response = await api.post("/flashcards/generate", { documentId, count });
+  generateFlashcards: async (data: { documentId: string; count?: number; difficulty?: string; topic?: string }) => {
+    const response = await api.post("/flashcards/generate", data);
     return response.data;
   },
 
@@ -28,6 +28,17 @@ export const flashcardService = {
 
   getStats: async () => {
     const response = await api.get("/flashcards/stats");
+    return response.data;
+  },
+  deleteFlashcard: async (id: string) => {
+    const response = await api.delete(`/flashcards/${id}`);
+    return response.data;
+  },
+
+  deleteFlashcardSet: async (documentId: string) => {
+    const response = await api.delete(`/flashcards`, {
+      params: { documentId }
+    });
     return response.data;
   },
 };

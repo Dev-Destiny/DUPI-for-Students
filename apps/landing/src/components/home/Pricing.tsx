@@ -1,5 +1,5 @@
 import { type FC } from "react";
-import { Button } from "@dupi/ui/components/ui/button";
+import { Button } from "@studify/ui/components/ui/button";
 import { motion } from "framer-motion";
 import toast from "react-hot-toast";
 

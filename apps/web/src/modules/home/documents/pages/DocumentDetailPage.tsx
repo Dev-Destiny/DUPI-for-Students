@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowLeft, Clock, CheckCircle2, AlertCircle, Layers, GraduationCap, Share2, MessageCircle } from "lucide-react";
-import { Button, Card, ScrollArea, Input } from "@dupi/ui";
+import { ArrowLeft, Clock, AlertCircle, Layers, GraduationCap, Share2, MessageCircle, RefreshCcw } from "lucide-react";
+import { Button, Card, ScrollArea, Input } from "@studify/ui";
 import { documentService } from "@/services/document.service";
 import { GenerationModal } from "@/components/modals/GenerationModal";
 import { ShareDialog } from "@/components/modals/ShareDialog";
+import { Typewriter } from "@/components/Typewriter";
 
 const spring = { type: "spring", stiffness: 260, damping: 30 };
 
@@ -23,7 +24,7 @@ const DocumentDetailPage: React.FC = () => {
 	const [isChatOpen, setIsChatOpen] = useState(false);
 	const [messages, setMessages] = useState<ChatMessage[]>([{
 		id: "welcome", role: "assistant",
-		content: "I'm your DUPI study copilot. Ask me anything about this document, generate a test, or create flashcards when you're ready.",
+		content: "I'm your Studify study copilot. Ask me anything about this document, generate a test, or create flashcards when you're ready.",
 	}]);
 
 	const openGeneration = (type: "test" | "flashcard") => {
@@ -55,15 +56,49 @@ const DocumentDetailPage: React.FC = () => {
 		setMessages((p) => [
 			...p,
 			{ id: `u-${Date.now()}`, role: "user", content: trimmed },
-			{ id: `a-${Date.now()}`, role: "assistant", content: "Once the RAG pipeline is active, DUPI will respond with grounded answers from your document. This is a design preview." },
+			{ id: `a-${Date.now()}`, role: "assistant", content: "Once the RAG pipeline is active, Studify will respond with grounded answers from your document. This is a design preview." },
 		]);
 		setInput("");
 	};
 
+	const handleRegenerateSummary = async () => {
+		if (!id) return;
+		try {
+			setIsLoading(true);
+			await documentService.regenerateSummary(id);
+			// Re-fetch document data to get the new summary
+			const data = await documentService.getDocumentById(id);
+			setDoc({
+				...data,
+				size: data.fileSizeBytes ? (data.fileSizeBytes / 1024 / 1024).toFixed(1) + " MB" : "Unknown",
+				status: data.processed ? "processed" : (data.processingError ? "error" : "analyzing"),
+				uploadedAt: new Date(data.createdAt).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" }),
+				progress: data.processed ? 100 : 50,
+			});
+		} catch (error) {
+			console.error("Failed to regenerate summary:", error);
+		} finally {
+			setIsLoading(false);
+		}
+	};
+
 	if (isLoading) {
 		return (
-			<div className='flex h-full items-center justify-center bg-background'>
-				<p className='text-xs font-medium text-muted-foreground animate-pulse'>Opening document…</p>
+			<div className='flex h-full flex-col bg-background relative overflow-hidden'>
+				<div className='max-w-3xl mx-auto w-full px-6 md:px-10 py-12 space-y-12'>
+					<div className='flex items-center gap-3 opacity-20'>
+						<div className='w-8 h-8 rounded-full bg-muted animate-pulse' />
+						<div className='w-20 h-4 bg-muted rounded animate-pulse' />
+					</div>
+					<div className='space-y-4'>
+						<div className='w-3/4 h-12 bg-muted rounded-2xl animate-pulse' />
+						<div className='w-1/2 h-4 bg-muted rounded-lg animate-pulse' />
+					</div>
+					<div className='space-y-6 pt-12'>
+						<div className='w-full h-32 bg-muted/30 rounded-3xl animate-pulse' />
+						<div className='w-full h-48 bg-muted/20 rounded-3xl animate-pulse' />
+					</div>
+				</div>
 			</div>
 		);
 	}
@@ -134,57 +169,122 @@ const DocumentDetailPage: React.FC = () => {
 					)}
 
 					{isError && (
-						<Card className='border-destructive/20 bg-destructive/5 shadow-soft'>
-							<div className='flex items-center gap-3 p-5'>
-								<AlertCircle className='size-5 text-destructive shrink-0' />
-								<div>
-									<p className='text-sm font-medium text-destructive'>Processing failed</p>
-									<p className='text-xs text-destructive/80 mt-0.5'>Try re-uploading a cleaner PDF version.</p>
+						<motion.div initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }}>
+							<Card className='border-destructive/20 bg-destructive/5 shadow-soft overflow-hidden group'>
+								<div className='absolute inset-0 bg-gradient-to-r from-destructive/5 to-transparent' />
+								<div className='flex items-center gap-4 p-6 relative'>
+									<div className='w-10 h-10 rounded-2xl bg-destructive/10 flex items-center justify-center shrink-0 border border-destructive/20'>
+										<AlertCircle className='size-5 text-destructive animate-pulse' />
+									</div>
+									<div>
+										<p className='text-sm font-black text-destructive uppercase tracking-widest'>Processing failed</p>
+										<p className='text-xs text-destructive/70 mt-1 font-medium'>An error occurred during indexing. Please try re-uploading the document.</p>
+									</div>
 								</div>
-							</div>
-						</Card>
+							</Card>
+						</motion.div>
 					)}
 
 					{!isProcessing && !isError && (
-						<>
-							{/* AI Summary — book-reader style */}
-							<Card className='bg-card border-border/30 shadow-soft rounded-3xl overflow-hidden'>
-								<div className='px-8 py-6 border-b border-border/30'>
-									<div className='flex items-center gap-2 mb-1'>
-										<span className='text-[10px] font-black uppercase tracking-widest text-muted-foreground'>AI Summary</span>
+						<motion.section 
+							initial={{ opacity: 0, y: 10 }}
+							animate={{ opacity: 1, y: 0 }}
+							transition={{ delay: 0.2 }}
+							className='space-y-12'
+						>
+							{/* AI Summary — Integrated style */}
+							<div className='space-y-8 relative'>
+								<div className='flex items-center gap-4'>
+									<div className='h-px flex-1 bg-border/50' />
+									<div className='flex items-center gap-2 px-4 py-1.5 rounded-full border border-border/50 bg-muted/20 backdrop-blur-sm'>
+										<span className='text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground'>
+											Content Analysis
+										</span>
 									</div>
-									<CheckCircle2 className='size-4 text-emerald-500' />
+									<div className='h-px flex-1 bg-border/50' />
 								</div>
-								<div className='px-8 py-6'>
-									<p className='font-serif text-base leading-loose text-foreground/90 max-w-prose'>
-										This document has been indexed and is ready for study. When the RAG pipeline is active, you'll see a high-level summary here — covering core definitions, key mechanisms, and the most exam-relevant concepts.
-									</p>
-									<p className='font-serif text-base leading-loose text-foreground/70 mt-4 max-w-prose'>
-										For biology chapters: key processes, diagrams, and molecular pathways. For essays: thesis, arguments, and supporting evidence. For technical docs: architecture, patterns, and gotchas.
-									</p>
-								</div>
-							</Card>
 
-							{/* How DUPI uses this */}
-							<div className='px-2'>
-								<h3 className='font-serif text-lg text-muted-foreground mb-3'>How DUPI uses this document</h3>
-								<ul className='space-y-2'>
-									{[
-										"Chunked and embedded into a vector store for semantic retrieval",
-										"Tests use RAG prompts to create grounded, exam-style questions",
-										"Flashcards target high-yield concepts, definitions, and common traps",
-									].map((item) => (
-										<li key={item} className='flex items-start gap-3 text-sm text-muted-foreground font-serif leading-relaxed'>
-											<span className='mt-2 w-1 h-1 rounded-full bg-muted-foreground/40 shrink-0' />
-											{item}
-										</li>
-									))}
-								</ul>
+								{doc.summary ? (
+									<div className='space-y-6'>
+										<Typewriter 
+											text={doc.summary} 
+											className="prose prose-sm md:prose-base dark:prose-invert max-w-none"
+										/>
+										<div className='p-6 rounded-3xl bg-card/40 border border-border/40 backdrop-blur-sm shadow-soft flex flex-col sm:flex-row sm:items-center justify-between gap-4'>
+											<p className='font-serif text-base leading-relaxed text-muted-foreground italic'>
+												"This AI-generated summary highlights core processes and exam-relevant patterns."
+											</p>
+											<Button 
+												variant="ghost" 
+												size="sm" 
+												onClick={handleRegenerateSummary}
+												className="rounded-xl h-9 px-4 text-xs font-bold gap-2 text-muted-foreground hover:text-brand-orange hover:bg-brand-orange/10 transition-all shrink-0"
+											>
+												<RefreshCcw className="size-3.5" />
+												Refresh
+											</Button>
+										</div>
+									</div>
+								) : (
+									<div className='space-y-6'>
+										<p className='font-serif text-xl md:text-2xl leading-relaxed text-foreground/90 selection:bg-brand-orange/20'>
+											This document has been successfully indexed and is being processed for semantic understanding. 
+											<span className='text-muted-foreground/60 transition-opacity hover:opacity-100'> 
+												{" "}Our RAG pipeline is mapping definitions, key mechanisms, and high-yield concepts for your next assessment.
+											</span>
+										</p>
+										<div className='p-6 rounded-3xl bg-card/40 border border-border/40 backdrop-blur-sm shadow-soft flex flex-col sm:flex-row sm:items-center justify-between gap-4'>
+											<p className='font-serif text-base leading-relaxed text-muted-foreground italic'>
+												"AI-generated summaries highlight core processes and exam-relevant patterns in real-time."
+											</p>
+											{doc.processed && (
+												<Button 
+													variant="ghost" 
+													size="sm" 
+													onClick={handleRegenerateSummary}
+													className="rounded-xl h-9 px-4 text-xs font-bold gap-2 text-muted-foreground hover:text-brand-orange hover:bg-brand-orange/10 transition-all shrink-0"
+												>
+													<RefreshCcw className="size-3.5" />
+													Generate Summary
+												</Button>
+											)}
+										</div>
+									</div>
+								)}
 							</div>
-						</>
-					)}
-				</div>
-			</ScrollArea>
+
+							{/* How Studify uses this */}
+							<motion.div 
+								initial={{ opacity: 0 }}
+								animate={{ opacity: 1 }}
+								transition={{ delay: 0.4 }}
+								className='pt-8 border-t border-border/50'
+							>
+								<h3 className='text-xs font-black uppercase tracking-[0.2em] text-muted-foreground mb-6 flex items-center gap-2'>
+									<div className='w-1 h-1 rounded-full bg-brand-orange shadow-[0_0_8px_rgba(255,111,32,0.8)]' />
+									Strategic Integration
+								</h3>
+								<div className='grid grid-cols-1 md:grid-cols-3 gap-6'>
+									{[
+										{ title: "Retrieval", desc: "Chunked and embedded into our semantic vector space." },
+										{ title: "Assessments", desc: "RAG-powered prompts for grounded questions." },
+										{ title: "Recall", desc: "Flashcard generation focusing on high-yield traps." },
+									].map((item, i) => (
+										<div key={i} className='space-y-2 group'>
+											<h4 className='text-[10px] font-black uppercase tracking-widest text-foreground/80 group-hover:text-brand-orange transition-colors'>
+												{item.title}
+											</h4>
+											<p className='text-xs text-muted-foreground leading-relaxed font-serif italic'>
+												{item.desc}
+											</p>
+										</div>
+									))}
+								</div>
+							</motion.div>
+							</motion.section>
+						)}
+					</div>
+				</ScrollArea>
 
 			{/* Floating Action Bar */}
 			<motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ ...spring, delay: 0.2 }}
@@ -233,7 +333,7 @@ const DocumentDetailPage: React.FC = () => {
 			)}
 
 			<GenerationModal isOpen={isGenerationOpen} onClose={() => setIsGenerationOpen(false)} initialType={generationType} documentId={id} />
-			<ShareDialog isOpen={isShareOpen} onClose={() => setIsShareOpen(false)} resourceTitle={doc?.title} shareUrl={`https://dupi.ai/share/${id}`} />
+			<ShareDialog isOpen={isShareOpen} onClose={() => setIsShareOpen(false)} resourceTitle={doc?.title} shareUrl={`https://studify.ai/share/${id}`} />
 		</div>
 	);
 };

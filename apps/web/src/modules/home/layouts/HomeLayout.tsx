@@ -42,7 +42,9 @@ import {
 	SidebarProvider,
 	SidebarTrigger,
 	useSidebar,
-} from "@dupi/ui";
+} from "@studify/ui";
+import { SearchModal } from "@/components/modals/SearchModal";
+import { useSearchStore } from "@/store/search.store";
 
 const navMain = [
 	{
@@ -137,7 +139,7 @@ function NavUser() {
 										{user?.displayName || "Sodiq Adesina"}
 									</span>
 									<span className='truncate text-[10px] text-muted-foreground'>
-										{user?.email || "sodiq@dupi.ai"}
+										{user?.email || "sodiq@studify.ai"}
 									</span>
 								</div>
 							</div>
@@ -257,6 +259,25 @@ export default function HomeLayout({
 }) {
 	const location = useLocation();
 	const { isMobile, setOpenMobile } = useSidebar();
+	const { toggle } = useSearchStore();
+	const { user } = useAuthStore();
+
+	React.useEffect(() => {
+		const handleKeyDown = (e: KeyboardEvent) => {
+			// Trigger search with '/' key
+			if (e.key === "/" && !["INPUT", "TEXTAREA"].includes((e.target as HTMLElement).tagName)) {
+				e.preventDefault();
+				toggle();
+			}
+			// Keep CMD/CTRL + K as a fallback as it's standard
+			if ((e.metaKey || e.ctrlKey) && e.key === "k") {
+				e.preventDefault();
+				toggle();
+			}
+		};
+		window.addEventListener("keydown", handleKeyDown);
+		return () => window.removeEventListener("keydown", handleKeyDown);
+	}, [toggle]);
 
 	React.useEffect(() => {
 		if (isMobile) {
@@ -268,17 +289,14 @@ export default function HomeLayout({
 		<SidebarProvider defaultOpen={true}>
 			<div className='flex min-h-svh w-full bg-background relative'>
 				<Sidebar collapsible='icon' className='border-r border-border'>
-					<SidebarHeader className='h-16 flex items-center px-4'>
+					<SidebarHeader className='h-16 flex py-4 px-4'>
 						<Link
 							to='/'
-							className='flex items-center gap-2 group overflow-hidden'
+							className='flex gap-2 group overflow-hidden'
 						>
-							<div className='flex h-8 w-8 items-center justify-center rounded-lg bg-brand-orange text-white shrink-0 group-hover:scale-105 transition-transform'>
-								<Zap className='size-4 fill-current' />
-							</div>
-							<div className='grid flex-1 text-left leading-tight group-data-[collapsible=icon]:hidden'>
+							<div className='flex-1 leading-tight group-data-[collapsible=icon]:hidden'>
 								<span className='truncate font-grotesk font-black text-xl text-foreground tracking-tighter'>
-									dupi
+									Studify
 									<span className='inline-block size-1.5 rounded-full bg-brand-orange ml-0.5'></span>
 								</span>
 							</div>
@@ -349,23 +367,6 @@ export default function HomeLayout({
 								))}
 							</SidebarMenu>
 						</SidebarGroup>
-
-						{/* Premium Promo */}
-						<SidebarGroup className='group-data-[collapsible=icon]:hidden mb-4'>
-							<div className='mx-2 mt-4 rounded-3xl bg-gradient-to-br from-brand-orange to-[#6C2B0D] p-5 text-white shadow-xl shadow-brand-orange/20 overflow-hidden relative group/promo'>
-								<div className='absolute -right-4 -top-4 w-20 h-20 bg-white/10 rounded-full blur-2xl group-hover/promo:scale-125 transition-transform duration-500' />
-								<h4 className='text-[10px] font-black font-grotesk mb-2 uppercase tracking-widest text-white/90'>
-									PRO ACCESS
-								</h4>
-								<p className='text-[11px] text-white/80 mb-4 font-medium leading-relaxed italic'>
-									Unlock unlimited study power & AI
-									generation.
-								</p>
-								<button className='w-full py-2 bg-white text-brand-orange text-[10px] font-black rounded-xl hover:bg-black hover:text-white transition-all shadow-lg active:scale-95'>
-									UPGRADE NOW
-								</button>
-							</div>
-						</SidebarGroup>
 					</SidebarContent>
 					<SidebarFooter className='border-t border-border p-2'>
 						<NavUser />
@@ -397,11 +398,16 @@ export default function HomeLayout({
 
 						{/* Small Profile on Mobile Topbar */}
 						<div className='md:hidden'>
-							<Avatar className='h-7 w-7 rounded-full border border-border shadow-sm'>
-								<AvatarFallback className='text-[10px] bg-brand-orange/10 text-brand-orange'>
-									JD
-								</AvatarFallback>
-							</Avatar>
+							<Link to='/settings'>
+								<Avatar className='h-8 w-8 rounded-full border border-border shadow-sm'>
+									<AvatarImage src={user?.profileImageUrl || ""} />
+									<AvatarFallback className='text-[10px] bg-brand-orange/10 text-brand-orange font-bold uppercase'>
+										{user?.displayName
+											?.substring(0, 2)
+											.toUpperCase() || "JD"}
+									</AvatarFallback>
+								</Avatar>
+							</Link>
 						</div>
 					</header>
 					<div className='flex flex-1 flex-col overflow-hidden items-center'>
@@ -412,6 +418,7 @@ export default function HomeLayout({
 				</main>
 			</div>
 			<MobileBottomNav />
+			<SearchModal />
 		</SidebarProvider>
 	);
 }

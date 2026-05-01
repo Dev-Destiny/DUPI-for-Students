@@ -23,7 +23,7 @@ export const OnboardingHeader: FC<{
 					</div>
 				)}
 				<span className='font-bold text-foreground font-grotesk tracking-tight'>
-					DUPI
+					Studify
 				</span>
 			</div>
 			{onSkip && (

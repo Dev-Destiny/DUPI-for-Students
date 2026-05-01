@@ -1,5 +1,5 @@
 {
-  "name": "@dupi/landing",
+  "name": "@studify/landing",
   "version": "1.0.0",
   "private": true,
   "type": "module",
@@ -10,7 +10,7 @@
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0"
   },
   "dependencies": {
-    "@dupi/ui": "workspace:*",
+    "@studify/ui": "workspace:*",
     "@supabase/supabase-js": "^2.98.0",
     "framer-motion": "^11.0.0",
     "lucide-react": "^0.344.0",

@@ -16,9 +16,10 @@ import {
 	DropdownMenuItem,
 	DropdownMenuTrigger,
 	DropdownMenuSeparator,
-} from "@dupi/ui";
+} from "@studify/ui";
 
 import { useNavigate } from "react-router-dom";
+import { testService } from "@/services/test.service";
 
 interface Test {
 	id: string;
@@ -33,11 +34,26 @@ interface Test {
 
 interface TestCardProps {
 	test: Test;
+	onDelete?: (id: string) => void;
 }
 
-export const TestCard: React.FC<TestCardProps> = ({ test }) => {
+export const TestCard: React.FC<TestCardProps> = ({ test, onDelete }) => {
 	const navigate = useNavigate();
 	
+	const handleDelete = async (e: React.MouseEvent) => {
+		e.stopPropagation(); // Prevent card click (navigation)
+		
+		if (window.confirm("Are you sure you want to delete this test?")) {
+			try {
+				await testService.deleteTest(test.id);
+				if (onDelete) onDelete(test.id);
+			} catch (error) {
+				console.error("Failed to delete test:", error);
+				alert("Failed to delete test. Please try again.");
+			}
+		}
+	};
+
 	const handleStart = () => {
 		navigate(`/tests/${test.id}`);
 	};
@@ -114,7 +130,7 @@ export const TestCard: React.FC<TestCardProps> = ({ test }) => {
 									</DropdownMenuItem>
 								)}
 								<DropdownMenuSeparator />
-								<DropdownMenuItem className='gap-2 text-xs font-bold text-destructive focus:text-destructive focus:bg-destructive/10'>
+								<DropdownMenuItem className='gap-2 text-xs font-bold text-destructive focus:text-destructive focus:bg-destructive/10' onClick={handleDelete}>
 									Delete Test
 								</DropdownMenuItem>
 							</DropdownMenuContent>

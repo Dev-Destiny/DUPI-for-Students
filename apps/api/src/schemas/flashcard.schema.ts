@@ -39,5 +39,7 @@ export const generateFlashcardsSchema = z.object({
   body: z.object({
     documentId: z.string().uuid("Invalid document ID"),
     count: z.number().int().min(1).max(50).optional(),
+    difficulty: z.enum(["easy", "medium", "hard"]).optional(),
+    topic: z.string().optional(),
   }),
 });

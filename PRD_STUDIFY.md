@@ -1,4 +1,4 @@
-# DUPI - Product Requirements Document (PRD)
+# Studify - Product Requirements Document (PRD)
 
 **Version:** 1.0  
 **Date:** February 8, 2026  
@@ -9,7 +9,7 @@
 
 ## Executive Summary
 
-DUPI is an AI-powered educational platform designed to centralize and optimize the personal study experience for students. The platform leverages Retrieval-Augmented Generation (RAG) to create interactive, contextual tests from user-provided materials, fostering active learning and knowledge retention. The MVP focuses on delivering a chat-based interface for test generation and a flashcard system, with plans to expand into a comprehensive study ecosystem.
+Studify is an AI-powered educational platform designed to centralize and optimize the personal study experience for students. The platform leverages Retrieval-Augmented Generation (RAG) to create interactive, contextual tests from user-provided materials, fostering active learning and knowledge retention. The MVP focuses on delivering a chat-based interface for test generation and a flashcard system, with plans to expand into a comprehensive study ecosystem.
 
 ---
 

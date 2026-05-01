@@ -58,6 +58,12 @@ export const createAttempt = async (testId: string, userId: string, data: { answ
   });
 
   const score = totalQuestions > 0 ? (correctCount / totalQuestions) * 100 : 0;
+  await prisma.test.update({
+    where: { id: testId },
+    data: {
+      attemptCount: test?.attemptCount + 1,
+    },
+  });
 
   return prisma.testAttempt.create({
     data: {

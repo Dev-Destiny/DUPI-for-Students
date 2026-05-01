@@ -31,6 +31,7 @@ class JobPayload(BaseModel):
 from prisma_db import db
 from extractor import extractor
 from vector_store import vector_store
+from generation import generation_service
 
 import asyncio
 
@@ -73,7 +74,11 @@ async def process_document(doc_id: str, user_id: str) -> None:
                 if not text:
                     raise Exception("No text extracted from document")
 
-                # 4. Chunk & Vectorize
+                # 4. Generate Summary
+                print(f"📝 Generating summary...")
+                summary = await generation_service.generate_summary(text)
+
+                # 5. Chunk & Vectorize
                 print(f"🧠 Vectorizing...")
                 collection_name = f"doc_{doc_id}"
                 metadata = {
@@ -84,15 +89,16 @@ async def process_document(doc_id: str, user_id: str) -> None:
                 
                 chunks_count, safe_collection_name = vector_store.add_document(text, collection_name, metadata)
                 
-                # 5. Update DB SUCCESS
+                # 6. Update DB SUCCESS
                 await db.update_status(
                     doc_id=doc_id,
                     processed=True,
                     chroma_id=safe_collection_name,
-                    chunks=chunks_count
+                    chunks=chunks_count,
+                    summary=summary
                 )
                 
-                print(f"✅ Success: Processed {chunks_count} chunks for {doc_id}")
+                print(f"✅ Success: Processed {chunks_count} chunks and summary for {doc_id}")
                 return # Exit on success
 
             except Exception as e:
@@ -117,12 +123,12 @@ async def process_document(doc_id: str, user_id: str) -> None:
 
 
 async def start_worker() -> None:
-    print("🤖 DUPI Python Worker started. Listening for jobs...")
+    print("🤖 Studify Python Worker started. Listening for jobs...")
     while True:
         try:
-            # BLPOP blocks until a job is available in the 'dupi_jobs' list
+            # BLPOP blocks until a job is available in the 'studify_jobs' list
             # We use 0 as timeout for infinite blocking or small number for periodic checks
-            job_data = redis_client.blpop("dupi_jobs", timeout=30)
+            job_data = redis_client.blpop("studify_jobs", timeout=30)
             
             if job_data:
                 _, payload = job_data

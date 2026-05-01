@@ -5,7 +5,7 @@
 
 @layer base {
 	:root {
-		/* DUPI Midnight Light (Soft White) */
+		/* Studify Midnight Light (Soft White) */
 		--background: 30 20% 98%; /* #FAF9F6 - Soft Paper */
 		--foreground: 240 10% 4%; /* Near Black */
 
@@ -38,7 +38,7 @@
 	}
 
 	.dark {
-		/* DUPI Midnight Dark (Elite Charcoal) */
+		/* Studify Midnight Dark (Elite Charcoal) */
 		--background: 240 10% 3.9%; /* #09090B */
 		--foreground: 0 0% 98%;
 

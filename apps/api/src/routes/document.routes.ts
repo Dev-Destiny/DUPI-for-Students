@@ -14,6 +14,7 @@ documentRouter.get("/", documentController.list);
 documentRouter.get("/:id", validate(documentIdSchema), documentController.get);
 documentRouter.delete("/:id", validate(documentIdSchema), documentController.remove);
 documentRouter.get("/:id/status", validate(documentIdSchema), documentController.status);
+documentRouter.post("/:id/regenerate-summary", validate(documentIdSchema), documentController.regenerateSummary);
 
 export default documentRouter;
 

@@ -1,11 +1,11 @@
 import { type FC, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Link } from "react-router-dom";
-import { Button } from "@dupi/ui/components/ui/button";
+import { Button } from "@studify/ui/components/ui/button";
 import { supabase } from "../lib/supabase";
 import { Mail, ArrowLeft, Loader2, Sparkles, Check } from "lucide-react";
 import toast from "react-hot-toast";
-import { useIsMobile } from "@dupi/ui";
+import { useIsMobile } from "@studify/ui";
 
 const WaitlistPage: FC = () => {
 	const [email, setEmail] = useState("");
@@ -72,7 +72,7 @@ const WaitlistPage: FC = () => {
 			<header className='w-full max-w-7xl mx-auto px-6 py-8 relative z-10 flex items-center justify-between'>
 				<Link to='/' className='flex items-center gap-1 group'>
 					<span className='font-grotesk font-bold tracking-tighter text-foreground text-3xl flex items-center gap-[4px] transition-transform group-hover:scale-105'>
-						dupi
+						studify
 						<span className='w-2.5 h-2.5 rounded-full bg-brand-orange'></span>
 					</span>
 				</Link>
@@ -106,7 +106,7 @@ const WaitlistPage: FC = () => {
 					</h1>
 
 					<p className='text-lg text-muted-foreground mb-12 max-w-xl mx-auto leading-relaxed'>
-						DUPI uses AI to instantly convert your lecture notes
+						Studify uses AI to instantly convert your lecture notes
 						into interactive tests and flashcards. Join the
 						exclusive waitlist to be instantly notified when we
 						launch.

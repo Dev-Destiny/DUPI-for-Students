@@ -1,7 +1,7 @@
 import React, { useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Upload, FileText, CheckCircle2, AlertCircle } from "lucide-react";
-import { Button } from "@dupi/ui";
+import { Button } from "@studify/ui";
 import { documentService } from "@/services/document.service";
 import { toast } from "sonner";
 

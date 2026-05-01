@@ -3,6 +3,8 @@ import prisma from "../lib/prisma";
 import { ApiError } from "../utils/ApiError";
 import crypto from "crypto";
 import { connection as redis } from "../utils/redis";
+import axios from "axios";
+import { env } from "../config/env";
 
 /**
  * Uploads a document to Supabase and creates a Prisma record.
@@ -53,7 +55,7 @@ export const uploadAndCreateDocument = async (file: Express.Multer.File, userId:
 	});
 
 	// Dispatch background task to Python Processor via Redis List
-	await redis.lpush("dupi_jobs", JSON.stringify({
+	await redis.lpush("studify_jobs", JSON.stringify({
 		documentId: newDocument.id,
 		userId
 	}));
@@ -61,9 +63,7 @@ export const uploadAndCreateDocument = async (file: Express.Multer.File, userId:
 	return newDocument;
 };
 
-/**
- * Fetches all documents for a specific user, ordered by creation date.
- */
+
 export const getDocumentsByUser = async (userId: string) => {
 	return await prisma.document.findMany({
 		where: { userId },
@@ -71,9 +71,7 @@ export const getDocumentsByUser = async (userId: string) => {
 	});
 };
 
-/**
- * Fetches a single document by its ID and validates user ownership.
- */
+
 export const getDocumentById = async (id: string, userId: string) => {
 	const document = await prisma.document.findFirst({
 		where: { id, userId },
@@ -87,37 +85,48 @@ export const getDocumentById = async (id: string, userId: string) => {
 };
 
 /**
- * Deletes a document from both the database and Supabase storage.
+ * Deletes a document from Database, Supabase Storage, and Chroma Vector DB.
+ * Chained to prevent orphaned assets.
  */
 export const deleteDocument = async (id: string, userId: string) => {
-	// First ensure it exists and belongs to the user
 	const document = await getDocumentById(id, userId);
 
-	// Attempt to delete the file from Supabase
+	// 2. Chained Operations
+	
+	// A. Delete associated Flashcards and Tests (Manual cascade since schema missing it)
+	// We handle this first to clear dependent records in Postgres
+	await prisma.flashcard.deleteMany({ where: { documentId: id } });
+	await prisma.test.deleteMany({ where: { documentId: id } });
+
+	// B. Delete from Vector Store (Chroma)
+	if (document.chromaCollectionId) {
+		try {
+			await axios.delete(`${env.AI_PROCESSOR_URL}/vector-store/${document.chromaCollectionId}`);
+		} catch (error) {
+			console.error("Vector Store Deletion Error (non-blocking):", error);
+		}
+	}
+
+	// C. Delete from Supabase Storage
 	try {
 		const bucketName = process.env.SUPABASE_BUCKET_NAME || "documents";
-		
 		const storagePath = document.storagePath;
 		
 		if (storagePath) {
 			await supabaseAdmin.storage.from(bucketName).remove([storagePath]);
 		} else {
-			// Fallback for older records without storagePath
-			const urlParts = document.fileUrl.split('/');
-			const filename = urlParts.pop();
-			const folderId = urlParts.pop();
-			
-			if (filename && folderId) {
-				const fallbackPath = `${folderId}/${filename}`;
-				await supabaseAdmin.storage.from(bucketName).remove([fallbackPath]);
+			// Fallback for older records
+			const urlParts = document.fileUrl.split(`/public/${bucketName}/`);
+			const path = urlParts[1];
+			if (path) {
+				await supabaseAdmin.storage.from(bucketName).remove([path]);
 			}
 		}
 	} catch (error) {
-		console.error("Supabase Deletion Error:", error);
-		// Proceed with DB deletion even if cloud deletion fails to prevent ghost records
+		console.error("Supabase Deletion Error (non-blocking):", error);
 	}
 
-	// Delete from Prisma
+	// D. Final deletion from Prisma (The source of truth)
 	return await prisma.document.delete({
 		where: { id },
 	});

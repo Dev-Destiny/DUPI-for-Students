@@ -5,7 +5,7 @@ dotenv.config();
 
 const envSchema = z.object({
   NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
-  PORT: z.string().default("3000"),
+  PORT: z.string().default("3000").transform((val) => Number(val)),
   DATABASE_URL: z.string().url(),
   JWT_SECRET: z.string().min(8),
   JWT_REFRESH_SECRET: z.string().min(8),
@@ -14,6 +14,9 @@ const envSchema = z.object({
   SUPABASE_SERVICE_ROLE_KEY: z.string(),
   SUPABASE_BUCKET_NAME: z.string().default("documents"),
   REDIS_URL: z.string().url().default("redis://localhost:6379"),
+  AI_PROCESSOR_URL: z.string().url().default("http://localhost:8000"),
+  GOOGLE_CLIENT_ID: z.string().optional(),
+  GOOGLE_CLIENT_SECRET: z.string().optional(),
 });
 
 const _env = envSchema.safeParse(process.env);
