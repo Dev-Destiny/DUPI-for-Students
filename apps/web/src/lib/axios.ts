@@ -2,6 +2,7 @@ import axios from "axios";
 
 // Using a relative URL by default, but supporting VITE_API_URL for production
 const API_URL = import.meta.env.VITE_API_URL || "/api";
+console.log(API_URL)
 
 export const api = axios.create({
   baseURL: API_URL,
