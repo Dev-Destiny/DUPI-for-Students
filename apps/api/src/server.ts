@@ -1,5 +1,5 @@
 import express from "express";
-import { env } from "./config/env";
+import { env } from "./config/env.js";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import helmet from "helmet";
