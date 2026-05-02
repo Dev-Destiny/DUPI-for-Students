@@ -16,19 +16,22 @@ export const Typewriter: React.FC<TypewriterProps> = ({ text, speed = 2, classNa
 		setDisplayedText("");
 		setIsComplete(false);
 		
-		let index = 0;
+		if (!text) {
+			setIsComplete(true);
+			return;
+		}
+
+		let currentIndex = 0;
 		const intervalId = setInterval(() => {
-			setDisplayedText((prev) => {
-				const nextChar = text.slice(index, index + 5); // Take 5 chars at a time for efficiency and speed
-				index += 5;
-				
-				if (index >= text.length) {
-					clearInterval(intervalId);
-					setIsComplete(true);
-					return text;
-				}
-				return text.slice(0, index);
-			});
+			currentIndex += 5; // Take 5 chars at a time for speed
+			
+			if (currentIndex >= text.length) {
+				clearInterval(intervalId);
+				setDisplayedText(text);
+				setIsComplete(true);
+			} else {
+				setDisplayedText(text.slice(0, currentIndex));
+			}
 		}, speed);
 
 		return () => clearInterval(intervalId);
@@ -39,14 +42,14 @@ export const Typewriter: React.FC<TypewriterProps> = ({ text, speed = 2, classNa
 			<ReactMarkdown 
 				remarkPlugins={[remarkGfm]}
 				components={{
-					h1: ({ node, ...props }) => <h1 className="text-2xl font-serif text-foreground mb-4 mt-6" {...props} />,
-					h2: ({ node, ...props }) => <h2 className="text-xl font-serif text-foreground mb-3 mt-5" {...props} />,
-					h3: ({ node, ...props }) => <h3 className="text-lg font-serif text-foreground mb-2 mt-4" {...props} />,
-					p: ({ node, ...props }) => <p className="mb-4 leading-relaxed text-foreground/90 font-serif" {...props} />,
-					ul: ({ node, ...props }) => <ul className="list-disc pl-5 mb-4 space-y-2" {...props} />,
-					ol: ({ node, ...props }) => <ol className="list-decimal pl-5 mb-4 space-y-2" {...props} />,
-					li: ({ node, ...props }) => <li className="font-serif text-foreground/80" {...props} />,
-					blockquote: ({ node, ...props }) => (
+					h1: ({ node: _node, ...props }) => <h1 className="text-2xl font-serif text-foreground mb-4 mt-6" {...props} />,
+					h2: ({ node: _node, ...props }) => <h2 className="text-xl font-serif text-foreground mb-3 mt-5" {...props} />,
+					h3: ({ node: _node, ...props }) => <h3 className="text-lg font-serif text-foreground mb-2 mt-4" {...props} />,
+					p: ({ node: _node, ...props }) => <p className="mb-4 leading-relaxed text-foreground/90 font-serif" {...props} />,
+					ul: ({ node: _node, ...props }) => <ul className="list-disc pl-5 mb-4 space-y-2" {...props} />,
+					ol: ({ node: _node, ...props }) => <ol className="list-decimal pl-5 mb-4 space-y-2" {...props} />,
+					li: ({ node: _node, ...props }) => <li className="font-serif text-foreground/80" {...props} />,
+					blockquote: ({ node: _node, ...props }) => (
 						<blockquote className="border-l-4 border-brand-orange/40 pl-4 py-1 italic bg-brand-orange/5 rounded-r-xl mb-4" {...props} />
 					),
 				}}

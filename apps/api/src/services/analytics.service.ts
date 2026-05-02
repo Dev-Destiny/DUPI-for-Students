@@ -1,5 +1,6 @@
 import prisma from "../lib/prisma";
 import { startOfDay, subDays, format, isSameDay, differenceInDays } from "date-fns";
+import { TestAttempt, FlashcardReview, Flashcard } from "@prisma/client";
 
 export const getUserAnalytics = async (userId: string) => {
 	// 1. Get all Test Attempts and Flashcard Reviews
@@ -8,14 +9,14 @@ export const getUserAnalytics = async (userId: string) => {
 			where: { userId },
 			orderBy: { completedAt: "desc" },
 			include: { test: true },
-		}),
+		}) as Promise<Array<TestAttempt & { test: any }>>,
 		prisma.flashcardReview.findMany({
 			where: { userId },
 			orderBy: { reviewedAt: "desc" },
-		}),
+		}) as Promise<Array<FlashcardReview>>,
 		prisma.flashcard.findMany({
 			where: { userId },
-		}),
+		}) as Promise<Array<Flashcard>>,
 	]);
 
 	// --- 2. Calculate Streak ---
