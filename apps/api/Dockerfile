@@ -38,7 +38,7 @@ RUN pnpm install --frozen-lockfile --prod
 
 WORKDIR /app/apps/api
 # Use --yes and specify version to download prisma CLI on the fly, since it's a devDependency omitted by --prod
-RUN npx --yes prisma@5.17.0 generate --generator client
+RUN pnpm dlx prisma@5.17.0 generate --generator client
 
 EXPOSE 5000
 USER node-api
