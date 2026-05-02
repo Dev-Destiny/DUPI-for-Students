@@ -33,7 +33,7 @@ app.use(
   })
 );
 
-app.options('/{*path}', cors())
+
 
 app.use(cors({
   origin: (origin, callback) => {
@@ -48,6 +48,7 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization'],
 }))
 
+app.options('/{*path}', cors())
 
 // Health Check
 app.get("/health", (req, res) => {
