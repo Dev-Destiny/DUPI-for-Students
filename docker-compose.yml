@@ -15,8 +15,8 @@ services:
 
   processor:
     build:
-      context: apps/processor
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: apps/processor/Dockerfile
     ports:
       - "8000:8000"
     environment:
