@@ -1,7 +1,7 @@
 import axios from "axios";
-import { env } from "../config/env";
-import prisma from "../lib/prisma";
-import { ApiError } from "../utils/ApiError";
+import { env } from "../config/env.js";
+import prisma from "../lib/prisma.js";
+import { ApiError } from "../utils/ApiError.js";
 
 export const generateTest = async (
 	documentId: string,

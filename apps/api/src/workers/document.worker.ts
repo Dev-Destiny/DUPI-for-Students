@@ -1,9 +1,9 @@
 import { Queue, Worker, Job } from "bullmq";
-import { connection } from "../utils/redis";
-import prisma from "../lib/prisma";
-import * as documentService from "../services/document.service";
-import { extractionService } from "../services/extraction.service";
-import { vectorService } from "../services/vector.service";
+import { connection } from "../utils/redis.js";
+import prisma from "../lib/prisma.js";
+import * as documentService from "../services/document.service.js";
+import { extractionService } from "../services/extraction.service.js";
+import { vectorService } from "../services/vector.service.js";
 
 const QUEUE_NAME = "document-processing";
 

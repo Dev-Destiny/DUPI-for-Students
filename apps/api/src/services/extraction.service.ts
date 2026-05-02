@@ -1,5 +1,5 @@
 import mammoth from "mammoth";
-import { ApiError } from "../utils/ApiError";
+import { ApiError } from "../utils/ApiError.js";
 import { PDFParse } from "pdf-parse";
 // import PdfParse from "pdf-parse";
 

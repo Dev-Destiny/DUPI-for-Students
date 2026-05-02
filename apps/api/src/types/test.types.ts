@@ -6,7 +6,7 @@ import {
   testAttemptSchema, 
   shareTestSchema,
   sharedTokenSchema
-} from "../schemas/test.schema";
+} from "../schemas/test.schema.js";
 
 export type TestIdParams = z.infer<typeof testIdSchema>["params"];
 export type GenerateTestPayload = z.infer<typeof generateTestSchema>["body"];

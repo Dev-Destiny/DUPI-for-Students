@@ -1,14 +1,14 @@
 import bcrypt from "bcryptjs";
 import { OAuth2Client } from "google-auth-library";
-import prisma from "../lib/prisma";
-import { ApiError } from "../utils/ApiError";
-import * as jwtUtils from "../utils/jwt";
+import prisma from "../lib/prisma.js";
+import { ApiError } from "../utils/ApiError.js";
+import * as jwtUtils from "../utils/jwt.js";
 import {
 	LoginPayload,
 	RegisterPayload,
 	UpdateProfilePayload,
 	GoogleLoginPayload,	
-} from "../types";
+} from "../types/index.js";
 
 const googleClient = new OAuth2Client(
 	process.env.GOOGLE_CLIENT_ID,

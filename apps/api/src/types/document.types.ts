@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { documentIdSchema } from "../schemas/document.schema";
+import { documentIdSchema } from "../schemas/document.schema.js";
 
 export type DocumentIdParams = z.infer<typeof documentIdSchema>["params"];
 // Upload payload is mostly handled by Multer (File object)

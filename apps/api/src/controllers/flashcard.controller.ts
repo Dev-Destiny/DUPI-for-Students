@@ -1,9 +1,9 @@
 import { Request, Response, NextFunction, RequestHandler } from "express";
-import * as flashcardService from "../services/flashcard.service";
-import { ApiError } from "../utils/ApiError";
+import * as flashcardService from "../services/flashcard.service.js";
+import { ApiError } from "../utils/ApiError.js";
 
-import * as generationService from "../services/generation.service";
-import { CreateFlashcardPayload, FlashcardIdParams, GenerateFlashcardsPayload, ReviewFlashcardPayload, UpdateFlashcardPayload } from "../types";
+import * as generationService from "../services/generation.service.js";
+import { CreateFlashcardPayload, FlashcardIdParams, GenerateFlashcardsPayload, ReviewFlashcardPayload, UpdateFlashcardPayload } from "../types/index.js";
 
 export const generate = async (req: Request, res: Response, next: NextFunction) => {
   try {

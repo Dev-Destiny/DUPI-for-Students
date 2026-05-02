@@ -1,7 +1,7 @@
 import { Router } from "express";
-import * as testController from "../controllers/test.controller";
-import { authenticate } from "../middlewares/auth.middleware";
-import { validate } from "../middlewares/validate.middleware";  
+import * as testController from "../controllers/test.controller.js";
+import { authenticate } from "../middlewares/auth.middleware.js";
+import { validate } from "../middlewares/validate.middleware.js";  
 import { 
   generateTestSchema, 
   shareTestSchema, 
@@ -9,7 +9,7 @@ import {
   testAttemptSchema, 
   testIdSchema, 
   updateTestSchema 
-} from "../schemas/test.schema";
+} from "../schemas/test.schema.js";
 
 const testRouter = Router();
 

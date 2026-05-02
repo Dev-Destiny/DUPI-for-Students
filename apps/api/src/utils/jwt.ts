@@ -1,6 +1,6 @@
 import jwt from "jsonwebtoken";
-import { env } from "../config/env";
-import { AccessTokenPayload, RefreshTokenPayload } from "../types/auth.types";
+import { env } from "../config/env.js";
+import { AccessTokenPayload, RefreshTokenPayload } from "../types/auth.types.js";
 
 const ACCESS_TOKEN_SECRET = env.JWT_SECRET;
 const REFRESH_TOKEN_SECRET = env.JWT_REFRESH_SECRET;

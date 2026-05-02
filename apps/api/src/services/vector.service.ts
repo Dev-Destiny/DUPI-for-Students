@@ -1,7 +1,7 @@
 import { ChromaClient, Collection } from "chromadb";
 import { OpenAIEmbeddings } from "@langchain/openai";
 import { RecursiveCharacterTextSplitter } from "@langchain/textsplitters";
-import { ApiError } from "../utils/ApiError";
+import { ApiError } from "../utils/ApiError.js";
 
 /**
  * Service to manage vector storage (ChromaDB) and document chunking.

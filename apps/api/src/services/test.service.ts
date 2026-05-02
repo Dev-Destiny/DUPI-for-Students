@@ -1,5 +1,5 @@
-import prisma from "../lib/prisma";
-import { ApiError } from "../utils/ApiError";
+import prisma from "../lib/prisma.js";
+import { ApiError } from "../utils/ApiError.js";
 
 export const getTestsByUser = async (userId: string) => {
   return prisma.test.findMany({

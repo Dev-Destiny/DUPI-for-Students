@@ -1,5 +1,5 @@
 import z from "zod";
-import { registerSchema, loginSchema, updateProfileSchema, googleLoginSchema, accessTokenSchema, refreshTokenSchema } from "../schemas/auth.schema";
+import { registerSchema, loginSchema, updateProfileSchema, googleLoginSchema, accessTokenSchema, refreshTokenSchema } from "../schemas/auth.schema.js";
 
 export type RegisterPayload = z.infer<typeof registerSchema>["body"];
 export type LoginPayload = z.infer<typeof loginSchema>["body"];

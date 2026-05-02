@@ -1,8 +1,8 @@
 import { RequestHandler } from "express";
-import { ApiError } from "../utils/ApiError";
-import * as documentService from "../services/document.service";
-import * as generationService from "../services/generation.service";
-import { DocumentIdParams } from "../types";
+import { ApiError } from "../utils/ApiError.js";
+import * as documentService from "../services/document.service.js";
+import * as generationService from "../services/generation.service.js";
+import { DocumentIdParams } from "../types/index.js";
 
 export const upload: RequestHandler = async (req, res, next) => {
 	try {

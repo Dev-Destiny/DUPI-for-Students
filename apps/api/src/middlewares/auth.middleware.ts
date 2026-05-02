@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction, RequestHandler } from "express";
-import { verifyAccessToken } from "../utils/jwt";
-import { ApiError } from "../utils/ApiError";
+import { verifyAccessToken } from "../utils/jwt.js";
+import { ApiError } from "../utils/ApiError.js";
 
 export const authenticate: RequestHandler = (req, res, next) => {
   const authHeader = req.headers.authorization;

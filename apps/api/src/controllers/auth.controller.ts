@@ -1,7 +1,7 @@
 import { RequestHandler } from "express";
-import * as authService from "../services/auth.service";
-import { RegisterPayload, LoginPayload, UpdateProfilePayload, GoogleLoginPayload } from "../types";
-import prisma from "../lib/prisma";
+import * as authService from "../services/auth.service.js";
+import { RegisterPayload, LoginPayload, UpdateProfilePayload, GoogleLoginPayload } from "../types/index.js";
+import prisma from "../lib/prisma.js";
 
 export const register: RequestHandler = async (req, res, next) => {
   try {

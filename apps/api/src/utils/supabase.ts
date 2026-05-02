@@ -1,6 +1,6 @@
 import { createClient } from "@supabase/supabase-js";
 
-import { env } from "../config/env";
+import { env } from "../config/env.js";
 
 const supabaseUrl = env.SUPABASE_URL;
 const supabaseServiceRoleKey = env.SUPABASE_SERVICE_ROLE_KEY;

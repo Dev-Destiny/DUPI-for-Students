@@ -5,7 +5,7 @@ import {
   updateFlashcardSchema, 
   reviewFlashcardSchema,
   generateFlashcardsSchema
-} from "../schemas/flashcard.schema";
+} from "../schemas/flashcard.schema.js";
 
 export type FlashcardIdParams = z.infer<typeof flashcardIdSchema>["params"];
 export type CreateFlashcardPayload = z.infer<typeof createFlashcardSchema>["body"];

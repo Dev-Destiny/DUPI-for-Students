@@ -1,9 +1,9 @@
 import { Request, Response, NextFunction } from "express";
-import * as testService from "../services/test.service";
-import { ApiError } from "../utils/ApiError";
+import * as testService from "../services/test.service.js";
+import { ApiError } from "../utils/ApiError.js";
 
-import * as generationService from "../services/generation.service";
-import { GenerateTestPayload, TestAttemptPayload, TestIdParams, UpdateTestPayload } from "../types";
+import * as generationService from "../services/generation.service.js";
+import { GenerateTestPayload, TestAttemptPayload, TestIdParams, UpdateTestPayload } from "../types/index.js";
 
 export const generate = async (req: Request, res: Response, next: NextFunction) => {
   try {

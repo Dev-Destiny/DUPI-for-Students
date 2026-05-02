@@ -1,10 +1,10 @@
-import { supabaseAdmin } from "../utils/supabase";
-import prisma from "../lib/prisma";
-import { ApiError } from "../utils/ApiError";
+import { supabaseAdmin } from "../utils/supabase.js";
+import prisma from "../lib/prisma.js";
+import { ApiError } from "../utils/ApiError.js";
 import crypto from "crypto";
-import { connection as redis } from "../utils/redis";
+import { connection as redis } from "../utils/redis.js";
 import axios from "axios";
-import { env } from "../config/env";
+import { env } from "../config/env.js";
 
 /**
  * Uploads a document to Supabase and creates a Prisma record.

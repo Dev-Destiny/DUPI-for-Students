@@ -1,4 +1,4 @@
-import prisma from "./lib/prisma";
+import prisma from "./lib/prisma.js";
 async function check() {
   try {
     const docs = await prisma.document.findMany({ take: 1 });

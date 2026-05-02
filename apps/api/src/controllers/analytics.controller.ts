@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import * as analyticsService from "../services/analytics.service";
+import * as analyticsService from "../services/analytics.service.js";
 
 export const getAnalytics = async (req: Request, res: Response, next: NextFunction) => {
 	try {

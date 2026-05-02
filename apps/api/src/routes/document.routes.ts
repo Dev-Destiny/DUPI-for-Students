@@ -1,9 +1,9 @@
 import { Router } from "express";
-import * as documentController from "../controllers/document.controller";
-import { authenticate } from "../middlewares/auth.middleware";
-import { uploadMiddleware } from "../middlewares/upload.middleware";
-import { validate } from "../middlewares/validate.middleware";
-import { documentIdSchema } from "../schemas/document.schema";
+import * as documentController from "../controllers/document.controller.js";
+import { authenticate } from "../middlewares/auth.middleware.js";
+import { uploadMiddleware } from "../middlewares/upload.middleware.js";
+import { validate } from "../middlewares/validate.middleware.js";
+import { documentIdSchema } from "../schemas/document.schema.js";
 
 const documentRouter = Router();
 

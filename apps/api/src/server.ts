@@ -6,12 +6,12 @@ import helmet from "helmet";
 import morgan from "morgan";
 import rateLimit from "express-rate-limit";
 
-import authRouter from "./routes/auth.routes";
-import documentRouter from "./routes/document.routes";
-import testRouter from "./routes/test.routes";
-import flashcardRouter from "./routes/flashcard.routes";
-import analyticsRouter from "./routes/analytics.routes";
-import { errorHandler } from "./middlewares/error.middleware";
+import authRouter from "./routes/auth.routes.js";
+import documentRouter from "./routes/document.routes.js";
+import testRouter from "./routes/test.routes.js";
+import flashcardRouter from "./routes/flashcard.routes.js";
+import analyticsRouter from "./routes/analytics.routes.js";
+import { errorHandler } from "./middlewares/error.middleware.js";
 
 // Node.js worker disabled - background processing moved to /apps/processor (Python)
 // import "./workers/document.worker";
