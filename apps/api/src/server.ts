@@ -33,13 +33,21 @@ app.use(
   })
 );
 
-app.use(
-  cors({
-    origin: env.FRONTEND_URL,
-    methods: ["POST", "GET", "PUT", "DELETE"],
-    credentials: true,
-  })
-);
+app.options('/{*path}', cors())
+
+app.use(cors({
+  origin: (origin, callback) => {
+    if (!origin || env.FRONTEND_URL.split(",").includes(origin)) {
+      callback(null, true)
+    } else {
+      callback(new Error("Not allowed by CORS"))
+    }
+  },
+  credentials: true, // keep this if you're using cookies/sessions
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+}))
+
 
 // Health Check
 app.get("/health", (req, res) => {
@@ -71,3 +79,5 @@ const PORT = env.PORT;
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`🚀 Studify API is running on port ${PORT} [${env.NODE_ENV}]`);
 });
+
+
