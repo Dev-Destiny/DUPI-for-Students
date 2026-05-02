@@ -16,11 +16,7 @@ COPY apps/api ./apps/api
 # Install dependencies
 RUN pnpm install --frozen-lockfile
 
-# Build shared package first
-WORKDIR /app/packages/shared
-RUN pnpm build
-
-# Build API (if needed, though mostly TS execution)
+# Build API
 WORKDIR /app/apps/api
 RUN pnpm build
 
