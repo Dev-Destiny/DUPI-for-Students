@@ -16,8 +16,11 @@ COPY apps/api ./apps/api
 # Install dependencies
 RUN pnpm install --frozen-lockfile
 
-# Build API
+# Generate Prisma client types before building
 WORKDIR /app/apps/api
+RUN npx prisma generate
+
+# Build API
 RUN pnpm build
 
 # --- RUNNER STAGE ---
