@@ -35,8 +35,8 @@ COPY --from=builder /app/apps/api ./apps/api
 
 WORKDIR /app/apps/api
 
-# Ensure prisma client is generated in the final image
-RUN npx prisma generate
+# Ensure prisma JS client is generated in the final image
+RUN npx prisma generate --generator client
 
 # Expose port
 EXPOSE 5000

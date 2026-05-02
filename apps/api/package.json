@@ -8,7 +8,7 @@
     "build": "tsc",
     "start": "node dist/server.js",
     "lint": "eslint . --ext ts --report-unused-disable-directives --max-warnings 0",
-    "prisma:generate": "prisma generate",
+    "prisma:generate": "prisma generate --generator client",
     "prisma:migrate": "prisma migrate dev",
     "prisma:studio": "prisma studio"
   },
