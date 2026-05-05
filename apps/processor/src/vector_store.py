@@ -1,8 +1,7 @@
 import os
 import chromadb
 from chromadb.config import Settings
-# from langchain_google_genai import GoogleGenerativeAIEmbeddings
-from langchain_huggingface import HuggingFaceEmbeddings
+from langchain_google_genai import GoogleGenerativeAIEmbeddings
 from langchain_chroma import Chroma
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_core.documents import Document as LCDocument
@@ -30,11 +29,12 @@ class VectorStoreManager:
             # Local/Standard configuration
             self.client = chromadb.HttpClient(host=self.host, port=int(self.port))
         
-        # Switched to HuggingFace local embeddings (Free, unlimited)
-        print("💡 Loading HuggingFace Embeddings (all-MiniLM-L6-v2)...")
-        self.embeddings = HuggingFaceEmbeddings(
-            model_name="sentence-transformers/all-MiniLM-L6-v2",
-            model_kwargs={'device': 'cpu'},
+        # Using Google Gemini Embeddings (API-based, saves memory)
+        print("💡 Loading Google Gemini Embeddings (text-embedding-004)...")
+        api_key = os.getenv("GOOGLE_API_KEY") or os.getenv("GEMINI_API_KEY")
+        self.embeddings = GoogleGenerativeAIEmbeddings(
+            model="models/text-embedding-004",
+            google_api_key=api_key
         )
         
         self.text_splitter = RecursiveCharacterTextSplitter(
