@@ -77,7 +77,7 @@ app.use(errorHandler);
 
 const PORT = env.PORT;
 
-app.listen(PORT, '0.0.0.0', () => {
+app.listen(PORT, '::', () => {
   console.log(`🚀 Studify API is running on port ${PORT} [${env.NODE_ENV}]`);
 });
 
