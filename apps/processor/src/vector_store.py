@@ -21,7 +21,7 @@ class VectorStoreManager:
                 tenant=self.tenant,
                 database=self.database,
                 settings=Settings(
-                    chroma_client_auth_provider="chromadb.auth.token_auth.TokenAuthClientProvider",
+                    chroma_client_auth_provider="chromadb.auth.token_authn.TokenAuthClientProvider",
                     chroma_client_auth_credentials=self.api_key
                 )
             )
