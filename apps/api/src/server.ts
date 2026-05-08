@@ -22,6 +22,9 @@ import { errorHandler } from "./middlewares/error.middleware.js";
 
 const app = express();
 
+// Trust the first proxy (Railway load balancer)
+app.set("trust proxy", 1);
+
 // Security & Middlewares
 app.use(helmet());
 app.use(morgan("dev"));
