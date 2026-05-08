@@ -30,10 +30,10 @@ class VectorStoreManager:
             self.client = chromadb.HttpClient(host=self.host, port=int(self.port))
         
         # Using Google Gemini Embeddings (API-based, saves memory)
-        print("💡 Loading Google Gemini Embeddings (text-embedding-004)...")
+        print("💡 Loading Google Gemini Embeddings (gemini-embedding-2)...")
         api_key = os.getenv("GOOGLE_API_KEY") or os.getenv("GEMINI_API_KEY")
         self.embeddings = GoogleGenerativeAIEmbeddings(
-            model="models/text-embedding-004",
+            model="models/gemini-embedding-2",
             google_api_key=api_key
         )
         
