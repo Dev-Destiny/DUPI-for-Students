@@ -16,14 +16,14 @@ class VectorStoreManager:
 
         if self.api_key and self.tenant:
             # Chroma Cloud configuration
-            self.client = chromadb.HttpClient(
-                host=self.host,
+            self.client = chromadb.CloudClient(
                 tenant=self.tenant,
                 database=self.database,
-                settings=Settings(
-                    chroma_client_auth_provider="chromadb.auth.token_authn.TokenAuthClientProvider",
-                    chroma_client_auth_credentials=self.api_key
-                )
+                # settings=Settings(
+                #     chroma_client_auth_provider="chromadb.auth.token_authn.TokenAuthClientProvider",
+                #     chroma_client_auth_credentials=self.api_key
+                # )
+                api_key=self.api_key
             )
         else:
             # Local/Standard configuration

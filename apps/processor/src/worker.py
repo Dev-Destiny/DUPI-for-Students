@@ -9,10 +9,15 @@ from supabase import create_client, Client
 
 load_dotenv()
 
-# Initialize Redis
+# Initialize Redis with robust connection settings for cloud providers
 REDIS_URL = os.getenv("REDIS_URL", "redis://localhost:6379")
-# Handle rediss:// for Upstash
-redis_client = redis.from_url(REDIS_URL, decode_responses=True)
+redis_client = redis.from_url(
+    REDIS_URL, 
+    decode_responses=True,
+    socket_keepalive=True,
+    retry_on_timeout=True,
+    health_check_interval=30 # Periodically check if connection is alive
+)
 
 # Initialize Supabase
 SUPABASE_URL = os.getenv("SUPABASE_URL")
