@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useMemo } from "react";
 import { motion } from "framer-motion";
 import {
 	FilePlus2,
@@ -13,9 +13,9 @@ import {
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@studify/ui";
-import { documentService } from "@/services/document.service";
 import { useSearchStore } from "@/store/search.store";
 import { toast } from "sonner";
+import { useDocumentsQuery } from "@/hooks/use-studify-query";
 
 const quickActions = [
 	{
@@ -51,39 +51,25 @@ const quickActions = [
 const DashboardPage: React.FC = () => {
 	const navigate = useNavigate();
 	const { open } = useSearchStore();
-	const [recentNotes, setRecentNotes] = useState<any[]>([]);
-	const [isLoading, setIsLoading] = useState(true);
-
-	const fetchRecentNotes = async () => {
-		try {
-			setIsLoading(true);
-			const docs = await documentService.getDocuments();
-			// Take last 3 and format for the UI
-			const formatted = docs.slice(0, 3).map((doc: any) => {
-				const ext = (doc.title.split('.').pop() || "doc").toUpperCase();
+	const { data = [], isLoading } = useDocumentsQuery();
+	const recentNotes = useMemo(
+		() =>
+			(Array.isArray(data) ? data : []).slice(0, 3).map((doc: any) => {
+				const ext = (doc.title.split(".").pop() || "doc").toUpperCase();
 				let color = "bg-blue-500";
 				if (ext === "PDF") color = "bg-red-500";
 				if (ext === "TXT") color = "bg-emerald-500";
-				
+
 				return {
 					id: doc.id,
 					title: doc.title,
 					lastOpened: `Added on ${new Date(doc.createdAt).toLocaleDateString()}`,
 					type: ext,
-					color: color,
+					color,
 				};
-			});
-			setRecentNotes(formatted);
-		} catch (error) {
-			console.error("Failed to fetch recent notes:", error);
-		} finally {
-			setIsLoading(false);
-		}
-	};
-
-	useEffect(() => {
-		fetchRecentNotes();
-	}, []);
+			}),
+		[data],
+	);
 
 	return (
 		<div className='flex-1 flex flex-col bg-background p-4 md:p-8 overflow-y-auto custom-scrollbar relative'>

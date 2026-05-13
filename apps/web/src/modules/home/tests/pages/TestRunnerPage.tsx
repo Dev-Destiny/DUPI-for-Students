@@ -3,8 +3,11 @@ import { useParams, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { CheckCircle2, ArrowLeft, ArrowRight, Timer, Trophy, RotateCcw, Home, Loader2 } from "lucide-react";
 import { Button, Card } from "@studify/ui";
-import { testService } from "@/services/test.service";
 import { toast } from "sonner";
+import {
+	useSubmitTestAttemptMutation,
+	useTestQuery,
+} from "@/hooks/use-studify-query";
 
 const spring = { type: "spring", stiffness: 260, damping: 30 };
 
@@ -16,8 +19,6 @@ interface TestResults { score: number; totalQuestions: number; correctAnswers: n
 const TestRunnerPage: React.FC = () => {
 	const { id } = useParams<{ id: string }>();
 	const navigate = useNavigate();
-	const [test, setTest] = useState<TestData | null>(null);
-	const [isLoading, setIsLoading] = useState(true);
 	const [currentIndex, setCurrentIndex] = useState(0);
 	const [answers, setAnswers] = useState<Record<string, string>>({});
 	const [secondsElapsed, setSecondsElapsed] = useState(0);
@@ -25,21 +26,23 @@ const TestRunnerPage: React.FC = () => {
 	const [results, setResults] = useState<TestResults | null>(null);
 	const [flaggedQuestions, setFlaggedQuestions] = useState<Set<string>>(new Set());
 	const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+	const {
+		data: test,
+		isLoading,
+		isError,
+	} = useTestQuery(id) as {
+		data: TestData | undefined;
+		isLoading: boolean;
+		isError: boolean;
+	};
+	const submitAttempt = useSubmitTestAttemptMutation(id);
 
 	useEffect(() => {
-		const fetchTest = async () => {
-			if (!id) return;
-			try {
-				setIsLoading(true);
-				const data = await testService.getTestById(id);
-				setTest(data);
-			} catch {
-				toast.error("Could not load the test.");
-				navigate("/tests");
-			} finally { setIsLoading(false); }
-		};
-		fetchTest();
-	}, [id, navigate]);
+		if (isError) {
+			toast.error("Could not load the test.");
+			navigate("/tests");
+		}
+	}, [isError, navigate]);
 
 	useEffect(() => {
 		let interval: ReturnType<typeof setInterval>;
@@ -74,7 +77,10 @@ const TestRunnerPage: React.FC = () => {
 		if (!id) return;
 		setIsSubmitting(true);
 		try {
-			const data = await testService.submitAttempt(id, answers, secondsElapsed);
+			const data = await submitAttempt.mutateAsync({
+				answers,
+				timeSpentSeconds: secondsElapsed,
+			});
 			setResults(data);
 		} catch { toast.error("Failed to submit."); }
 		finally { setIsSubmitting(false); }

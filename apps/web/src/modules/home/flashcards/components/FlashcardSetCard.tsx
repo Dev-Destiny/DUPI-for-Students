@@ -20,7 +20,7 @@ import {
 
 import { useNavigate } from "react-router-dom";
 
-import { flashcardService } from "@/services/flashcard.service";
+import { useDeleteFlashcardSetMutation } from "@/hooks/use-studify-query";
 import { Trash2 } from "lucide-react";
 
 interface FlashcardSet {
@@ -41,6 +41,7 @@ interface FlashcardSetCardProps {
 
 export const FlashcardSetCard: React.FC<FlashcardSetCardProps> = ({ set, onDelete }) => {
 	const navigate = useNavigate();
+	const deleteFlashcardSet = useDeleteFlashcardSetMutation();
 
 	const handleStudy = () => {
 		navigate(`/flashcards/${set.id}`);
@@ -50,7 +51,7 @@ export const FlashcardSetCard: React.FC<FlashcardSetCardProps> = ({ set, onDelet
 		e.stopPropagation();
 		if (window.confirm("Are you sure you want to delete this entire flashcard set?")) {
 			try {
-				await flashcardService.deleteFlashcardSet(set.id);
+				await deleteFlashcardSet.mutateAsync(set.id);
 				if (onDelete) onDelete(set.id);
 			} catch (error) {
 				console.error("Failed to delete flashcard set:", error);

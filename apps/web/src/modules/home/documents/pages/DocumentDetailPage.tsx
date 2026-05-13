@@ -1,12 +1,16 @@
-import React, { useState, useEffect } from "react";
+import React, { useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ArrowLeft, Clock, AlertCircle, Layers, GraduationCap, Share2, MessageCircle, RefreshCcw } from "lucide-react";
 import { Button, Card, ScrollArea, Input } from "@studify/ui";
-import { documentService } from "@/services/document.service";
 import { GenerationModal } from "@/components/modals/GenerationModal";
 import { ShareDialog } from "@/components/modals/ShareDialog";
 import { Typewriter } from "@/components/Typewriter";
+import {
+	formatDocument,
+	useDocumentQuery,
+	useRegenerateSummaryMutation,
+} from "@/hooks/use-studify-query";
 
 const spring = { type: "spring", stiffness: 260, damping: 30 };
 
@@ -16,8 +20,6 @@ const DocumentDetailPage: React.FC = () => {
 	const { id } = useParams<{ id: string }>();
 	const navigate = useNavigate();
 	const [input, setInput] = useState("");
-	const [doc, setDoc] = useState<any>(null);
-	const [isLoading, setIsLoading] = useState(true);
 	const [isGenerationOpen, setIsGenerationOpen] = useState(false);
 	const [generationType, setGenerationType] = useState<"test" | "flashcard">("test");
 	const [isShareOpen, setIsShareOpen] = useState(false);
@@ -26,29 +28,14 @@ const DocumentDetailPage: React.FC = () => {
 		id: "welcome", role: "assistant",
 		content: "I'm your Studify study copilot. Ask me anything about this document, generate a test, or create flashcards when you're ready.",
 	}]);
+	const { data, isLoading, isError: isDocumentError } = useDocumentQuery(id);
+	const regenerateSummary = useRegenerateSummaryMutation(id);
+	const doc = useMemo(() => (data ? formatDocument(data) : null), [data]);
 
 	const openGeneration = (type: "test" | "flashcard") => {
 		setGenerationType(type);
 		setIsGenerationOpen(true);
 	};
-
-	useEffect(() => {
-		if (!id) return;
-		(async () => {
-			try {
-				setIsLoading(true);
-				const data = await documentService.getDocumentById(id);
-				setDoc({
-					...data,
-					size: data.fileSizeBytes ? (data.fileSizeBytes / 1024 / 1024).toFixed(1) + " MB" : "Unknown",
-					status: data.processed ? "processed" : (data.processingError ? "error" : "analyzing"),
-					uploadedAt: new Date(data.createdAt).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" }),
-					progress: data.processed ? 100 : 50,
-				});
-			} catch { /* handle silently */ }
-			finally { setIsLoading(false); }
-		})();
-	}, [id]);
 
 	const handleSend = () => {
 		const trimmed = input.trim();
@@ -64,21 +51,9 @@ const DocumentDetailPage: React.FC = () => {
 	const handleRegenerateSummary = async () => {
 		if (!id) return;
 		try {
-			setIsLoading(true);
-			await documentService.regenerateSummary(id);
-			// Re-fetch document data to get the new summary
-			const data = await documentService.getDocumentById(id);
-			setDoc({
-				...data,
-				size: data.fileSizeBytes ? (data.fileSizeBytes / 1024 / 1024).toFixed(1) + " MB" : "Unknown",
-				status: data.processed ? "processed" : (data.processingError ? "error" : "analyzing"),
-				uploadedAt: new Date(data.createdAt).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" }),
-				progress: data.processed ? 100 : 50,
-			});
+			await regenerateSummary.mutateAsync();
 		} catch (error) {
 			console.error("Failed to regenerate summary:", error);
-		} finally {
-			setIsLoading(false);
 		}
 	};
 
@@ -103,7 +78,7 @@ const DocumentDetailPage: React.FC = () => {
 		);
 	}
 
-	if (!doc) {
+	if (!doc || isDocumentError) {
 		return (
 			<div className='flex h-full items-center justify-center bg-background'>
 				<div className='text-center space-y-4'>

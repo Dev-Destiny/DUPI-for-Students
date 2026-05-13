@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { api } from "@/lib/axios";
+import { useAnalyticsQuery } from "@/hooks/use-studify-query";
 
 // Components
 import StatCards from "../components/StatCards";
@@ -16,23 +16,7 @@ type Tab = (typeof tabs)[number];
 
 const AnalyticsPage: React.FC = () => {
 	const [activeTab, setActiveTab] = useState<Tab>("Overview");
-	const [isLoading, setIsLoading] = useState(true);
-	const [data, setData] = useState<any>(null);
-
-	const fetchAnalytics = async () => {
-		try {
-			const response = await api.get("/analytics");
-			setData(response.data);
-		} catch (error) {
-			console.error("Failed to fetch analytics:", error);
-		} finally {
-			setIsLoading(false);
-		}
-	};
-
-	useEffect(() => {
-		fetchAnalytics();
-	}, []);
+	const { data, isLoading } = useAnalyticsQuery();
 
 	if (isLoading) {
 		return (

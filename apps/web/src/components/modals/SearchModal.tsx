@@ -1,65 +1,42 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Search, FileText, Layers, ChevronRight, Clock, FileUp, Loader2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useSearchStore } from "@/store/search.store";
-import { documentService } from "@/services/document.service";
-import { testService } from "@/services/test.service";
-import { flashcardService } from "@/services/flashcard.service";
+import {
+	groupFlashcardSets,
+	useDocumentsQuery,
+	useFlashcardsQuery,
+	useTestsQuery,
+} from "@/hooks/use-studify-query";
 
 export const SearchModal: React.FC = () => {
 	const navigate = useNavigate();
 	const { isOpen, close } = useSearchStore();
 	const [searchQuery, setSearchQuery] = useState("");
-	const [isSearching, setIsSearching] = useState(false);
-	const [allData, setAllData] = useState<{ documents: any[], tests: any[], flashcards: any[] }>({ documents: [], tests: [], flashcards: [] });
-
-	const fetchSearchData = async () => {
-		try {
-			setIsSearching(true);
-			const [docs, tests, cards] = await Promise.all([
-				documentService.getDocuments(),
-				testService.getTests(),
-				flashcardService.getFlashcards()
-			]);
-
-			// Group flashcards by document
-			const groupedCards: Record<string, any> = {};
-			cards.forEach((card: any) => {
-				const docId = card.documentId || "standalone";
-				if (!groupedCards[docId]) {
-					groupedCards[docId] = {
-						id: docId,
-						title: card.document?.title || "Standalone Deck",
-						cardsCount: 0
-					};
-				}
-				groupedCards[docId].cardsCount++;
-			});
-
-			setAllData({
-				documents: docs,
-				tests: tests,
-				flashcards: Object.values(groupedCards)
-			});
-		} catch (error) {
-			console.error("Failed to fetch search data:", error);
-		} finally {
-			setIsSearching(false);
-		}
-	};
+	const documentsQuery = useDocumentsQuery(isOpen);
+	const testsQuery = useTestsQuery(isOpen);
+	const flashcardsQuery = useFlashcardsQuery(isOpen);
+	const isSearching =
+		documentsQuery.isLoading || testsQuery.isLoading || flashcardsQuery.isLoading;
+	const flashcardSets = useMemo(
+		() =>
+			Array.isArray(flashcardsQuery.data)
+				? groupFlashcardSets(flashcardsQuery.data)
+				: [],
+		[flashcardsQuery.data],
+	);
 
 	useEffect(() => {
 		if (isOpen) {
-			fetchSearchData();
 			setSearchQuery("");
 		}
 	}, [isOpen]);
 
 	const filteredResults = {
-		documents: allData.documents.filter(d => d.title.toLowerCase().includes(searchQuery.toLowerCase())).slice(0, 4),
-		tests: allData.tests.filter(t => t.title.toLowerCase().includes(searchQuery.toLowerCase())).slice(0, 4),
-		flashcards: allData.flashcards.filter(f => f.title.toLowerCase().includes(searchQuery.toLowerCase())).slice(0, 4)
+		documents: ((documentsQuery.data ?? []) as any[]).filter((d: any) => d.title.toLowerCase().includes(searchQuery.toLowerCase())).slice(0, 4),
+		tests: ((testsQuery.data ?? []) as any[]).filter((t: any) => t.title.toLowerCase().includes(searchQuery.toLowerCase())).slice(0, 4),
+		flashcards: flashcardSets.filter((f: any) => f.title.toLowerCase().includes(searchQuery.toLowerCase())).slice(0, 4)
 	};
 
 	const hasResults = searchQuery.length > 0 && (filteredResults.documents.length > 0 || filteredResults.tests.length > 0 || filteredResults.flashcards.length > 0);
@@ -121,7 +98,7 @@ export const SearchModal: React.FC = () => {
 												<div className="space-y-3">
 													<h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/40 ml-1">Documents</h3>
 													<div className="grid grid-cols-1 gap-1">
-														{filteredResults.documents.map(doc => (
+														{filteredResults.documents.map((doc: any) => (
 															<button
 																key={doc.id}
 																onClick={() => { navigate(`/documents/${doc.id}`); close(); }}
@@ -145,7 +122,7 @@ export const SearchModal: React.FC = () => {
 												<div className="space-y-3">
 													<h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/40 ml-1">Tests</h3>
 													<div className="grid grid-cols-1 gap-1">
-														{filteredResults.tests.map(test => (
+														{filteredResults.tests.map((test: any) => (
 															<button
 																key={test.id}
 																onClick={() => { navigate(`/tests/${test.id}`); close(); }}

@@ -3,8 +3,11 @@ import { useParams, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeft, RotateCcw, Home, Loader2, Sparkles } from "lucide-react";
 import { Button, Card } from "@studify/ui";
-import { flashcardService } from "@/services/flashcard.service";
 import { toast } from "sonner";
+import {
+	useFlashcardsQuery,
+	useReviewFlashcardMutation,
+} from "@/hooks/use-studify-query";
 
 const spring = { type: "spring", stiffness: 260, damping: 30 };
 
@@ -21,30 +24,29 @@ const reviewOptions = [
 const FlashcardSessionPage: React.FC = () => {
 	const { id } = useParams<{ id: string }>();
 	const navigate = useNavigate();
-	const [cards, setCards] = useState<Flashcard[]>([]);
-	const [isLoading, setIsLoading] = useState(true);
 	const [currentIndex, setCurrentIndex] = useState(0);
 	const [isFlipped, setIsFlipped] = useState(false);
 	const [isComplete, setIsComplete] = useState(false);
 	const [isTransitioning, setIsTransitioning] = useState(false);
 	const [reviewedCount, setReviewedCount] = useState(0);
 	const [hoveredQuality, setHoveredQuality] = useState<number | null>(null);
+	const { data = [], isLoading, isError } = useFlashcardsQuery();
+	const reviewFlashcard = useReviewFlashcardMutation();
+	const cards: Flashcard[] = Array.isArray(data)
+		? id === "all"
+			? data
+			: data.filter((card: any) => card.documentId === id)
+		: [];
 
 	useEffect(() => {
-		const fetchCards = async () => {
-			try {
-				setIsLoading(true);
-				const data = await flashcardService.getFlashcards();
-				const filtered = id === "all" ? data : data.filter((c: any) => c.documentId === id);
-				setCards(filtered);
-				if (filtered.length === 0) { toast.info("No flashcards found."); navigate("/flashcards"); }
-			} catch {
-				toast.error("Could not load flashcards.");
-				navigate("/flashcards");
-			} finally { setIsLoading(false); }
-		};
-		fetchCards();
-	}, [id, navigate]);
+		if (isError) {
+			toast.error("Could not load flashcards.");
+			navigate("/flashcards");
+		} else if (!isLoading && cards.length === 0) {
+			toast.info("No flashcards found.");
+			navigate("/flashcards");
+		}
+	}, [cards.length, isError, isLoading, navigate]);
 
 	const currentCard = cards[currentIndex];
 
@@ -52,7 +54,7 @@ const FlashcardSessionPage: React.FC = () => {
 		if (!currentCard || isTransitioning) return;
 		try {
 			setIsTransitioning(true);
-			await flashcardService.reviewFlashcard(currentCard.id, quality);
+			await reviewFlashcard.mutateAsync({ id: currentCard.id, quality });
 			setReviewedCount((p) => p + 1);
 			if (currentIndex < cards.length - 1) {
 				setIsFlipped(false);

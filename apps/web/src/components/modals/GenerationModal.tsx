@@ -1,11 +1,13 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Check, Loader2 } from "lucide-react";
 import { Button, Input } from "@studify/ui";
-import { testService } from "@/services/test.service";
-import { flashcardService } from "@/services/flashcard.service";
-import { documentService } from "@/services/document.service";
 import { toast } from "sonner";
+import {
+	useDocumentsQuery,
+	useGenerateFlashcardsMutation,
+	useGenerateTestMutation,
+} from "@/hooks/use-studify-query";
 
 interface Document {
 	id: string;
@@ -30,8 +32,6 @@ export const GenerationModal: React.FC<GenerationModalProps> = ({
 	const [step, setStep] = useState<1 | 2 | 3>(1);
 	const type = initialType; 
 	const [selectedDocId, setSelectedDocId] = useState<string | undefined>(documentId);
-	const [documents, setDocuments] = useState<Document[]>([]);
-	const [isLoadingDocs, setIsLoadingDocs] = useState(false);
 	
 	// Options
 	const [count, setCount] = useState(10);
@@ -41,31 +41,26 @@ export const GenerationModal: React.FC<GenerationModalProps> = ({
 	
 	const [isGenerating, setIsGenerating] = useState(false);
 	const [error, setError] = useState<string | null>(null);
+	const {
+		data: documents = [],
+		isLoading: isLoadingDocs,
+	} = useDocumentsQuery(isOpen && !documentId) as {
+		data: Document[];
+		isLoading: boolean;
+	};
+	const generateTest = useGenerateTestMutation();
+	const generateFlashcards = useGenerateFlashcardsMutation();
 
 	useEffect(() => {
 		if (isOpen) {
 			setStep(1);
 			setError(null);
-			if (!documentId) {
-				fetchDocs();
-			} else {
+			if (documentId) {
 				setSelectedDocId(documentId);
 				setStep(2); 
 			}
 		}
 	}, [isOpen, documentId]);
-
-	const fetchDocs = async () => {
-		try {
-			setIsLoadingDocs(true);
-			const docs = await documentService.getDocuments();
-			setDocuments(docs);
-		} catch (err) {
-			console.error("Failed to fetch documents", err);
-		} finally {
-			setIsLoadingDocs(false);
-		}
-	};
 
 	const handleGenerate = async () => {
 		if (!selectedDocId && !topic) {
@@ -78,7 +73,7 @@ export const GenerationModal: React.FC<GenerationModalProps> = ({
 		
 		try {
 			if (type === "test") {
-				await testService.generateTest({
+				await generateTest.mutateAsync({
 					documentId: selectedDocId,
 					topic: topic || undefined,
 					count,
@@ -87,7 +82,7 @@ export const GenerationModal: React.FC<GenerationModalProps> = ({
 				});
 				toast.success("Practice test generated successfully!");
 			} else {
-				await flashcardService.generateFlashcards({
+				await generateFlashcards.mutateAsync({
 					documentId: selectedDocId!,
 					count,
 					difficulty,

@@ -18,7 +18,7 @@ import {
 	DropdownMenuTrigger,
 	DropdownMenuSeparator,
 } from "@studify/ui";
-import { documentService } from "@/services/document.service";
+import { useDeleteDocumentMutation } from "@/hooks/use-studify-query";
 
 interface Document {
 	id: string;
@@ -33,17 +33,18 @@ interface Document {
 
 interface DocumentCardProps {
 	doc: Document;
-	onDelete: (id: string) => void
+	onDelete?: (id: string) => void
 }
 
 export const DocumentCard: React.FC<DocumentCardProps> = ({ doc, onDelete }) => {
 	const navigate = useNavigate();
+	const deleteDocument = useDeleteDocumentMutation();
 	const handleDelete = async (e: React.MouseEvent) => {
 		e.stopPropagation(); // Prevent card click (navigation)
 
 		if (window.confirm("Are you sure you want to delete this document?")) {
 			try {
-				await documentService.deleteDocument(doc.id);
+				await deleteDocument.mutateAsync(doc.id);
 				if (onDelete) onDelete(doc.id);
 			} catch (error) {
 				console.error("Failed to delete document:", error);

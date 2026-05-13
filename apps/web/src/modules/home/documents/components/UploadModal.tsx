@@ -2,7 +2,7 @@ import React, { useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Upload, FileText, CheckCircle2, AlertCircle } from "lucide-react";
 import { Button } from "@studify/ui";
-import { documentService } from "@/services/document.service";
+import { useUploadDocumentMutation } from "@/hooks/use-studify-query";
 import { toast } from "sonner";
 
 interface UploadModalProps {
@@ -22,6 +22,7 @@ export const UploadModal: React.FC<UploadModalProps> = ({
 		"idle" | "uploading" | "success" | "error"
 	>("idle");
 	const inputRef = useRef<HTMLInputElement>(null);
+	const uploadDocument = useUploadDocumentMutation();
 
 	const handleDrop = (e: React.DragEvent) => {
 		e.preventDefault();
@@ -43,7 +44,7 @@ export const UploadModal: React.FC<UploadModalProps> = ({
 
 		setStatus("uploading");
 		try {
-			await documentService.uploadDocument(file);
+			await uploadDocument.mutateAsync(file);
 
 			setStatus("success");
 			toast.success(`${file.name} uploaded successfully!`);

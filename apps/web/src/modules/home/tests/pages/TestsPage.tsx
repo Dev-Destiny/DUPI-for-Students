@@ -1,54 +1,22 @@
-import React, { useState, useEffect } from "react";
+import React, { useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Input } from "@studify/ui";
 import { Filter, Search, GraduationCap, Plus } from "lucide-react";
 import { TestCard } from "../components/TestCard";
-import { testService } from "@/services/test.service";
 import { GenerationModal } from "@/components/modals/GenerationModal";
+import { formatTestCard, useTestsQuery } from "@/hooks/use-studify-query";
 
 const Tabs = ["All Tests", "Completed", "In Progress", "Not Started"];
 
 const TestsPage: React.FC = () => {
 	const [activeTab, setActiveTab] = useState("All Tests");
 	const [searchQuery, setSearchQuery] = useState("");
-	const [tests, setTests] = useState<any[]>([]);
-	const [isLoading, setIsLoading] = useState(true);
 	const [isModalOpen, setIsModalOpen] = useState(false);
-
-	const fetchTests = async () => {
-		try {
-			setIsLoading(true);
-			const data = await testService.getTests();
-			
-			if (!data || !Array.isArray(data)) {
-				setTests([]);
-				return;
-			}
-
-			const formatted = data.map((test: any) => ({
-				id: test.id,
-				title: test.title || test.topic || "Untitled Test",
-				documentName: test.document?.title || "Manual Topic",
-				questionsCount: test.questionsCount || 0,
-				difficulty: test.difficulty || "medium",
-				status: (test.testAttempts && test.testAttempts.length > 0) ? "completed" : "new",
-				score: test.testAttempts?.[0]?.score,
-				lastAttempt: test.testAttempts?.[0] 
-					? new Date(test.testAttempts[0].completedAt).toLocaleDateString()
-					: null,
-			}));
-			setTests(formatted);
-			console.log("setted")
-		} catch (error) {
-			console.error("Failed to fetch tests:", error);
-		} finally {
-			setIsLoading(false);
-		}
-	};
-
-	useEffect(() => {
-		fetchTests();
-	}, []);
+	const { data = [], isLoading } = useTestsQuery();
+	const tests = useMemo(
+		() => (Array.isArray(data) ? data.map(formatTestCard) : []),
+		[data],
+	);
 
 	const filteredTests = tests.filter((test) => {
 		const matchesTab =
@@ -182,10 +150,7 @@ const TestsPage: React.FC = () => {
 									transition={{ delay: i * 0.05 + 0.2 }}
 								>
 									<TestCard 
-										test={test} 
-										onDelete={(id) => {
-											setTests(prev => prev.filter(t => t.id !== id));
-										}}
+										test={test}
 									/>
 								</motion.div>
 							))}
@@ -223,7 +188,6 @@ const TestsPage: React.FC = () => {
 				isOpen={isModalOpen} 
 				onClose={() => {
 					setIsModalOpen(false);
-					fetchTests(); // Refresh list after generation
 				}} 
 				initialType='test'
 			/>

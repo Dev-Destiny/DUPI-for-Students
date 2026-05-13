@@ -1,82 +1,25 @@
-import React, { useState, useEffect } from "react";
+import React, { useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Input } from "@studify/ui";
 import { Filter, Search, Layers, Plus } from "lucide-react";
 import { FlashcardSetCard } from "../components/FlashcardSetCard";
-import { flashcardService } from "@/services/flashcard.service";
 import { GenerationModal } from "@/components/modals/GenerationModal";
+import {
+	groupFlashcardSets,
+	useFlashcardsQuery,
+} from "@/hooks/use-studify-query";
 
 const Tabs = ["All Decks", "Due for Review", "Mastered", "New"];
 
 const FlashcardsPage: React.FC = () => {
 	const [activeTab, setActiveTab] = useState("All Decks");
 	const [searchQuery, setSearchQuery] = useState("");
-	const [flashcardSets, setFlashcardSets] = useState<any[]>([]);
-	const [isLoading, setIsLoading] = useState(true);
 	const [isModalOpen, setIsModalOpen] = useState(false);
-
-	const fetchFlashcards = async () => {
-		try {
-			setIsLoading(true);
-			const data = await flashcardService.getFlashcards();
-			
-			if (!data || !Array.isArray(data)) {
-				setFlashcardSets([]);
-				return;
-			}
-
-			const grouped: Record<string, any> = {};
-			data.forEach((card: any) => {
-				const docId = card.documentId || "standalone";
-				if (!grouped[docId]) {
-					grouped[docId] = {
-						id: docId,
-						title: card.document?.title || "Standalone Deck",
-						documentName: card.document?.title || "Manual added",
-						cardsCount: 0,
-						mastery: 0,
-						status: "new",
-						dueForReview: 0,
-						masteredCount: 0,
-						learningCount: 0,
-					};
-				}
-				grouped[docId].cardsCount++;
-				
-				// Mastery logic: easeFactor >= 2.5 and repetitions >= 3
-				const isMastered = Number(card.easeFactor) >= 2.5 && card.repetitions >= 3;
-				if (isMastered) {
-					grouped[docId].masteredCount++;
-				} else if (card.repetitions > 0) {
-					grouped[docId].learningCount++;
-				}
-
-				if (card.nextReview && new Date(card.nextReview) < new Date()) {
-					grouped[docId].dueForReview++;
-				}
-			});
-
-			// Finalize mastery percentage and status for each set
-			const finalized = Object.values(grouped).map(set => {
-				const mastery = Math.round((set.masteredCount / set.cardsCount) * 100);
-				let status = "new";
-				if (mastery >= 80) status = "mastered";
-				else if (set.learningCount > 0 || set.masteredCount > 0) status = "learning";
-				
-				return { ...set, mastery, status };
-			});
-
-			setFlashcardSets(finalized);
-		} catch (error) {
-			console.error("Failed to fetch flashcards:", error);
-		} finally {
-			setIsLoading(false);
-		}
-	};
-
-	useEffect(() => {
-		fetchFlashcards();
-	}, []);
+	const { data = [], isLoading } = useFlashcardsQuery();
+	const flashcardSets = useMemo(
+		() => (Array.isArray(data) ? groupFlashcardSets(data) : []),
+		[data],
+	);
 
 	const filteredSets = flashcardSets.filter((set) => {
 		const matchesTab =
@@ -210,10 +153,7 @@ const FlashcardsPage: React.FC = () => {
 									transition={{ delay: i * 0.05 + 0.2 }}
 								>
 									<FlashcardSetCard 
-										set={set} 
-										onDelete={(id) => {
-											setFlashcardSets(prev => prev.filter(s => s.id !== id));
-										}}
+										set={set}
 									/>
 								</motion.div>
 							))}
@@ -251,7 +191,6 @@ const FlashcardsPage: React.FC = () => {
 				isOpen={isModalOpen} 
 				onClose={() => {
 					setIsModalOpen(false);
-					fetchFlashcards();
 				}} 
 				initialType='flashcard'
 			/>

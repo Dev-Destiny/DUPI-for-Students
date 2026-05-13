@@ -19,7 +19,7 @@ import {
 } from "@studify/ui";
 
 import { useNavigate } from "react-router-dom";
-import { testService } from "@/services/test.service";
+import { useDeleteTestMutation } from "@/hooks/use-studify-query";
 
 interface Test {
 	id: string;
@@ -39,13 +39,14 @@ interface TestCardProps {
 
 export const TestCard: React.FC<TestCardProps> = ({ test, onDelete }) => {
 	const navigate = useNavigate();
+	const deleteTest = useDeleteTestMutation();
 	
 	const handleDelete = async (e: React.MouseEvent) => {
 		e.stopPropagation(); // Prevent card click (navigation)
 		
 		if (window.confirm("Are you sure you want to delete this test?")) {
 			try {
-				await testService.deleteTest(test.id);
+				await deleteTest.mutateAsync(test.id);
 				if (onDelete) onDelete(test.id);
 			} catch (error) {
 				console.error("Failed to delete test:", error);

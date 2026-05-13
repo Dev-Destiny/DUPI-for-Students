@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
 	FileText,
@@ -12,7 +12,7 @@ import { Button, Input, ScrollArea } from "@studify/ui";
 import { DocumentCard } from "../components/DocumentCard";
 import { DocumentsSidebar } from "../components/DocumentsSidebar";
 import { UploadModal } from "../components/UploadModal";
-import { documentService } from "@/services/document.service";
+import { formatDocumentCard, useDocumentsQuery } from "@/hooks/use-studify-query";
 
 interface DocumentData {
 	id: string;
@@ -27,41 +27,12 @@ interface DocumentData {
 const DocumentsPage: React.FC = () => {
 	const [searchQuery, setSearchQuery] = useState("");
 	const [view, setView] = useState<"grid" | "list">("grid");
-	const [documents, setDocuments] = useState<DocumentData[]>([]);
-	const [isLoading, setIsLoading] = useState(true);
 	const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
-
-	const fetchDocuments = async () => {
-		try {
-			setIsLoading(true);
-			const docs = await documentService.getDocuments();
-			const formatted = docs.map((doc: any) => ({
-				id: doc.id,
-				title: doc.title,
-				size: doc.fileSizeBytes
-					? (doc.fileSizeBytes / 1024 / 1024).toFixed(1) + "MB"
-					: "Unknown",
-				pages: null,
-				status: doc.processed
-					? "processed"
-					: doc.processingError
-						? "error"
-						: "analyzing",
-				uploadedAt: new Date(doc.createdAt).toLocaleDateString(),
-				type: doc.title.split(".").pop() || "doc",
-				progress: doc.processed ? 100 : 50,
-			}));
-			setDocuments(formatted);
-		} catch (error) {
-			console.error("Failed to fetch documents:", error);
-		} finally {
-			setIsLoading(false);
-		}
-	};
-
-	useEffect(() => {
-		fetchDocuments();
-	}, []);
+	const { data = [], isLoading } = useDocumentsQuery();
+	const documents = useMemo<DocumentData[]>(
+		() => (Array.isArray(data) ? data.map(formatDocumentCard) : []),
+		[data],
+	);
 
 	const filteredDocs = documents.filter((doc) =>
 		doc.title.toLowerCase().includes(searchQuery.toLowerCase()),
@@ -155,11 +126,6 @@ const DocumentsPage: React.FC = () => {
 										<DocumentCard
 											key={doc.id}
 											doc={doc}
-											onDelete={(id) => {
-												setDocuments((prev) =>
-													prev.filter((d) => d.id !== id),
-												);
-											}}
 										/>
 									))}
 								</AnimatePresence>
@@ -198,9 +164,7 @@ const DocumentsPage: React.FC = () => {
 			<UploadModal
 				isOpen={isUploadModalOpen}
 				onClose={() => setIsUploadModalOpen(false)}
-				onUploadComplete={() => {
-					fetchDocuments();
-				}}
+				onUploadComplete={() => undefined}
 			/>
 		</div>
 	);
